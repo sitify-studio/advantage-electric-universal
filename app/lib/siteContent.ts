@@ -359,6 +359,36 @@ export function getFooterNavLinks(pages?: Page[]): FooterNavLink[] {
   return links;
 }
 
+/** Header nav uses the same published page routes as the footer (includes home). */
+export function getHeaderNavLinks(pages?: Page[]): FooterNavLink[] {
+  return getFooterNavLinks(pages);
+}
+
+/** Page-based header entries with optional serving-areas dropdown after Services. */
+export function buildHeaderNavEntries(
+  pages?: Page[],
+  options?: { includeServingAreas?: boolean }
+): HomeHeaderNavEntry[] {
+  const entries: HomeHeaderNavEntry[] = getHeaderNavLinks(pages).map((link) => ({
+    kind: 'anchor',
+    id: link.id,
+    name: link.label,
+    href: link.href,
+  }));
+
+  if (!options?.includeServingAreas) return entries;
+
+  const servicePage = pages?.find((p) => p.pageType === 'service-list' && p.status === 'published');
+  const servicesIdx = servicePage
+    ? entries.findIndex((e) => e.kind === 'anchor' && e.id === servicePage._id)
+    : entries.findIndex((e) => e.kind === 'anchor' && e.href === '/services');
+
+  const insertAt = servicesIdx >= 0 ? servicesIdx + 1 : entries.length;
+  entries.splice(insertAt, 0, { kind: 'serving-areas' });
+
+  return entries;
+}
+
 export function getCopyrightText(site?: Site | null): string {
   const footerCopyright = tiptapToText(site?.footer?.copyright);
   if (footerCopyright) return footerCopyright;

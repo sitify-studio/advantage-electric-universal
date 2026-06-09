@@ -9,8 +9,7 @@ import { useSectionTheme } from '@/app/hooks/useSectionTheme';
 import {
   getBrandName,
   getBusinessTagline,
-  getHeaderNavItems,
-  getHomeHeaderNavEntries,
+  buildHeaderNavEntries,
   type HomeHeaderNavEntry,
 } from '@/app/lib/siteContent';
 import {
@@ -168,22 +167,17 @@ export function Header() {
     return url ? getImageSrc(url) : '/logo.png';
   }, [site?.theme?.logoUrl, site?.footer?.logo?.url]);
 
-  const homeNavEntries = useMemo<HomeHeaderNavEntry[]>(() => {
-    const homePage = pages.find((p) => p.pageType === 'home');
-    const fromHome = getHomeHeaderNavEntries(homePage);
-    if (fromHome.length > 0) return fromHome;
-
-    return getHeaderNavItems(pages).map((item) => ({
-      kind: 'anchor' as const,
-      id: item.id,
-      name: item.name,
-      href: item.href,
-    }));
-  }, [pages]);
-
   const servingAreaGroups = useMemo(
     () => buildServingAreaGroups(services, serviceAreaPages, site?.serviceAreas),
     [services, serviceAreaPages, site?.serviceAreas]
+  );
+
+  const homeNavEntries = useMemo<HomeHeaderNavEntry[]>(
+    () =>
+      buildHeaderNavEntries(pages, {
+        includeServingAreas: servingAreaGroups.length > 0,
+      }),
+    [pages, servingAreaGroups.length]
   );
 
   const accentColor = colors.primaryButton;
