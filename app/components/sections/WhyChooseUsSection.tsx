@@ -42,12 +42,12 @@ export function WhyChooseUsSection({ whyChooseUsSection, className }: WhyChooseU
   const accentColor = colors.primaryButton;
 
   return (
-    <section id="why-choose-us" className={cn('relative overflow-hidden bg-[#fcfcfc] py-20 lg:py-28', className)}>
+    <section id="why-choose-us" className={cn('relative overflow-hidden bg-[#fcfcfc] pt-12 lg:pt-16 pb-8 lg:pb-10', className)}>
       <div className="container mx-auto px-6 lg:px-12">
         <div
           ref={titleRef}
           className={cn(
-            'mb-14 lg:mb-20 max-w-3xl transition-all duration-1000',
+            'mb-8 lg:mb-10 max-w-3xl transition-all duration-1000',
             titleVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           )}
         >
