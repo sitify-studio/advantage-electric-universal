@@ -219,7 +219,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ blogSection, className
             )}
           >
             <SectionHeading
-              eyebrow="Journal"
+              eyebrow="Blogs"
               title={title}
               description={description}
               descriptionClassName="max-w-2xl"

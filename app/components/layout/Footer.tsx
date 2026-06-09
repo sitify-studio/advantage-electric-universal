@@ -56,7 +56,7 @@ export function Footer() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-8 sm:gap-12 mb-16 sm:mb-20">
           <div className="md:col-span-5">
-            <div className="relative w-40 h-12 mb-8">
+            <div className="relative w-52 h-16 mb-8">
               <Image
                 src={logoSrc}
                 alt={businessName || 'Business Name'}

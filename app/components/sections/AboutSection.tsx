@@ -187,14 +187,14 @@ export function AboutSection({ aboutSection, className }: AboutSectionProps) {
         <div className="flex w-full items-center px-6 py-12 lg:w-1/2 lg:min-h-screen lg:px-12 lg:py-12">
           <div className="max-w-xl">
             <SectionHeading
-              eyebrow="Excellence Defined"
+              eyebrow="About"
               title={title}
               description={description}
+              descriptionClassName="max-w-2xl mb-8 sm:mb-10"
               className={cn(
                 'transition-all duration-1000 delay-150',
                 sectionVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
               )}
-              descriptionClassName="mb-8 sm:mb-10"
             />
 
             {features.length > 0 && (

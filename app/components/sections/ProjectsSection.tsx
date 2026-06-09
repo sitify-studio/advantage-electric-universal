@@ -7,6 +7,7 @@ import type { Page, Project } from '@/app/lib/types';
 import { cn, getImageSrc } from '@/app/lib/utils';
 import { useWebBuilder } from '@/app/providers/WebBuilderProvider';
 import { useSectionTheme } from '@/app/hooks/useSectionTheme';
+import { SectionHeading } from '@/app/components/ui/SectionHeading';
 import { tiptapToText } from '@/app/lib/seo';
 
 interface ProjectsSectionProps {
@@ -189,18 +190,13 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           {/* Sticky left content */}
           <div className="lg:col-span-5">
             <div className="flex flex-col lg:sticky lg:top-24 lg:min-h-[calc(100vh-7rem)]">
-              {sectionTitle && (
-                <h2
-                  className="text-[clamp(1.5rem,2.5vw,2.25rem)] font-normal leading-snug text-slate-900"
-                  style={{ fontFamily: fonts.heading }}
-                >
-                  {sectionTitle}
-                </h2>
-              )}
-              {sectionDescription && (
-                <p className="mt-5 max-w-md text-sm leading-[1.75] text-slate-600">
-                  {sectionDescription}
-                </p>
+              {hasContent && (
+                <SectionHeading
+                  eyebrow="Projects"
+                  title={sectionTitle}
+                  description={sectionDescription}
+                  descriptionClassName="max-w-2xl"
+                />
               )}
             </div>
           </div>

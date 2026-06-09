@@ -298,9 +298,9 @@ export function Header() {
               <Image
                 src={logoImage}
                 alt={businessName || 'Logo'}
-                width={64}
-                height={64}
-                className="h-7 w-7 shrink-0 object-contain lg:h-8 lg:w-8"
+                width={80}
+                height={80}
+                className="h-9 w-9 shrink-0 object-contain lg:h-10 lg:w-10"
               />
               <div className="min-w-0 border-l border-slate-200/80 pl-3">
                 <span

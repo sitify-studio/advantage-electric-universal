@@ -189,7 +189,7 @@ export function ServicesSection({ servicesSection, className }: ServicesSectionP
             titleVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           )}
         >
-          <SectionHeading eyebrow="Our Expertise" title={title} description={description} />
+          <SectionHeading eyebrow="Services" title={title} description={description} />
         </div>
 
         {displayServices.length > 0 && (

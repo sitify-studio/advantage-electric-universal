@@ -66,7 +66,7 @@ export function CompanyDetailSection({ companyDetailSection, className }: Compan
           }`}
         >
           <SectionHeading
-            eyebrow="Core Philosophy"
+            eyebrow="Company Detail"
             title={heading}
             description={description}
             descriptionClassName="max-w-2xl"
