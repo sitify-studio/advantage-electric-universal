@@ -1,11 +1,14 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useMemo } from 'react';
 import type { Page } from '@/app/lib/types';
-import { useScrollAnimation, useStaggeredAnimation } from '@/app/hooks/useScrollAnimation';
+import { useWebBuilder } from '@/app/providers/WebBuilderProvider';
+import { useScrollAnimation } from '@/app/hooks/useScrollAnimation';
 import { useSectionTheme } from '@/app/hooks/useSectionTheme';
 import { tiptapToText } from '@/app/lib/seo';
+import { buildSectionPalette } from '@/app/lib/sectionPalette';
 import { SectionHeading } from '@/app/components/ui/SectionHeading';
 import { cn, getImageSrc } from '@/app/lib/utils';
 
@@ -65,8 +68,9 @@ function resolveAboutCta(data: Record<string, unknown>): { label: string; href: 
 }
 
 export function AboutSection({ aboutSection, className }: AboutSectionProps) {
-  const theme = useSectionTheme();
-  const { colors, fonts } = theme;
+  const { site } = useWebBuilder();
+  const { fonts } = useSectionTheme();
+  const palette = useMemo(() => buildSectionPalette(site), [site]);
 
   const title = useMemo(() => tiptapToText(aboutSection?.title), [aboutSection?.title]);
   const description = useMemo(
@@ -89,166 +93,93 @@ export function AboutSection({ aboutSection, className }: AboutSectionProps) {
     return resolveAboutCta(aboutSection as Record<string, unknown>);
   }, [aboutSection]);
 
-  const { ref: sectionRef, isVisible: sectionVisible } = useScrollAnimation<HTMLDivElement>({ threshold: 0.15 });
-  const { ref: imageRef, isVisible: imageVisible } = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 });
-  const { ref: featuresRef, visibleItems } = useStaggeredAnimation(features.length, 100);
+  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation<HTMLDivElement>({
+    threshold: 0.1,
+  });
 
   if (!aboutSection || aboutSection.enabled === false) return null;
   if (!title && !description && features.length === 0 && !aboutImage) return null;
 
-  const accentColor = colors.primaryButton;
-  const pageBg = colors.pageBackground;
-
   return (
     <section
       id="about"
-      ref={sectionRef}
-      className={cn('relative w-full overflow-hidden py-16 lg:py-0 lg:min-h-screen', className)}
-      style={{ backgroundColor: pageBg }}
+      className={cn('relative flex min-h-screen w-full flex-col overflow-hidden', className)}
+      style={{
+        background: `linear-gradient(180deg, ${palette.bgTop} 0%, ${palette.bgBottom} 100%)`,
+      }}
     >
       <div
-        className="pointer-events-none absolute -left-24 top-1/4 h-72 w-72 rounded-full blur-3xl opacity-25"
-        style={{ backgroundColor: accentColor }}
-      />
-      <div
-        className="pointer-events-none absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full blur-[100px] opacity-15"
-        style={{ backgroundColor: accentColor }}
-      />
+        ref={contentRef}
+        className={cn(
+          'relative z-30 mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 py-16 text-center transition-all duration-1000',
+          contentVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+        )}
+      >
+        <SectionHeading
+          eyebrow="About"
+          title={title}
+          description={description}
+          align="center"
+          className="max-w-3xl"
+          titleClassName="!text-[clamp(1.65rem,3.5vw,2.75rem)]"
+          descriptionClassName="max-w-2xl !text-sm sm:!text-[15px] mt-1"
+        />
 
-      <div className="relative z-10 flex w-full flex-col lg:min-h-screen lg:flex-row lg:items-stretch">
-        <div
-          ref={imageRef}
-          className="relative flex w-full flex-col px-6 pt-8 lg:w-1/2 lg:min-h-screen lg:px-12 lg:py-12 lg:pt-12"
-        >
-          <div
-            className={cn(
-              'group relative flex-1 transition-all duration-[1.4s] ease-out',
-              imageVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-            )}
-          >
-            <div
-              className="absolute -bottom-5 -right-5 hidden h-full w-full border sm:block"
-              style={{ borderColor: `${accentColor}35` }}
-            />
+        {features.length > 0 && (
+          <div className="mt-8 grid w-full max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
+            {features.map((feature, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <span
+                  className="text-[10px] font-bold uppercase tracking-[0.4em]"
+                  style={{ color: palette.primaryButton, fontFamily: fonts.body }}
+                >
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <p
+                  className="mt-2 text-sm font-light leading-relaxed"
+                  style={{ color: palette.subtext, fontFamily: fonts.body }}
+                >
+                  {feature}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
 
-            <div className="relative aspect-[4/5] overflow-hidden sm:aspect-[5/6] lg:aspect-auto lg:h-full lg:min-h-[420px]">
-              {aboutImage ? (
-                <>
-                  <Image
-                    src={aboutImage}
-                    alt={aboutSection.image?.altText?.trim() || title || 'About Us'}
-                    fill
-                    className={cn(
-                      'object-cover transition-all duration-[2s] ease-out',
-                      'grayscale-[15%] group-hover:grayscale-0 group-hover:scale-[1.04]',
-                      imageVisible ? 'scale-100' : 'scale-110'
-                    )}
-                    priority
-                  />
-                  <div
-                    className="absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
-                    style={{
-                      background: `linear-gradient(135deg, transparent 40%, ${accentColor}18 100%)`,
-                    }}
-                  />
-                </>
-              ) : (
-                <div className="h-full w-full" style={{ backgroundColor: `${accentColor}15` }} />
-              )}
-
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background: `linear-gradient(to right, transparent 55%, ${pageBg} 100%)`,
-                }}
-              />
-
-              <div
-                className={cn(
-                  'absolute left-0 top-0 h-full w-1 origin-top transition-transform duration-[1.2s] ease-out',
-                  imageVisible ? 'scale-y-100' : 'scale-y-0'
-                )}
-                style={{ backgroundColor: accentColor }}
-              />
-            </div>
-
-            <span
-              className={cn(
-                'absolute -left-2 top-6 text-[10px] font-bold uppercase tracking-[0.4em] transition-all duration-1000 delay-300 sm:left-0',
-                imageVisible ? 'opacity-100' : 'opacity-0'
-              )}
-              style={{ color: `${accentColor}80`, writingMode: 'vertical-rl' }}
+        {ctaButton && (
+          <div className="relative z-30 mt-8">
+            <Link
+              href={ctaButton.href}
+              className="inline-block px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] transition-opacity hover:opacity-90"
+              style={{
+                backgroundColor: palette.primaryButton,
+                color: palette.textOnDark,
+                fontFamily: fonts.body,
+              }}
             >
-              01
-            </span>
+              {ctaButton.label}
+            </Link>
           </div>
-        </div>
-
-        <div className="flex w-full items-center px-6 py-12 lg:w-1/2 lg:min-h-screen lg:px-12 lg:py-12">
-          <div className="max-w-xl">
-            <SectionHeading
-              eyebrow="About"
-              title={title}
-              description={description}
-              descriptionClassName="max-w-2xl mb-8 sm:mb-10"
-              className={cn(
-                'transition-all duration-1000 delay-150',
-                sectionVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-              )}
-            />
-
-            {features.length > 0 && (
-              <div ref={featuresRef} className="mb-8 space-y-0 sm:mb-10">
-                {features.map((feature, i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      'border-t border-slate-200/80 py-4 transition-all duration-700',
-                      visibleItems.includes(i)
-                        ? 'translate-x-0 opacity-100'
-                        : '-translate-x-3 opacity-0'
-                    )}
-                    style={{ transitionDelay: `${i * 80 + 200}ms` }}
-                  >
-                    <div className="mb-2 flex items-center gap-3">
-                      <span
-                        className="text-[10px] font-bold uppercase tracking-[0.35em]"
-                        style={{ color: accentColor }}
-                      >
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <div className="h-px w-10" style={{ backgroundColor: `${accentColor}40` }} />
-                    </div>
-                    <span className="text-sm font-light leading-relaxed text-slate-600">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {ctaButton && (
-              <div
-                className={cn(
-                  'transition-all duration-1000 delay-500',
-                  sectionVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-                )}
-              >
-                <a href={ctaButton.href} className="group inline-flex items-center gap-4">
-                  <span
-                    className="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-900 transition-colors group-hover:opacity-70"
-                    style={{ fontFamily: fonts.body }}
-                  >
-                    {ctaButton.label}
-                  </span>
-                  <div
-                    className="h-px w-8 transition-all duration-500 group-hover:w-14"
-                    style={{ backgroundColor: accentColor }}
-                  />
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
+        )}
       </div>
+
+      {aboutImage && (
+        <div className="relative z-10 mt-auto h-[38vh] w-full overflow-hidden md:h-[42vh]">
+          <Image
+            src={aboutImage}
+            alt={aboutSection.image?.altText?.trim() || title || 'About Us'}
+            fill
+            className="object-cover object-center"
+            sizes="100vw"
+          />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `linear-gradient(180deg, ${palette.bgBottom} 0%, transparent 40%)`,
+            }}
+          />
+        </div>
+      )}
     </section>
   );
 }
