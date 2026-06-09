@@ -1,0 +1,336 @@
+# Page Sections Documentation
+
+This document describes all available page sections in the Sitify Studio website builder.
+
+---
+
+## 1. Hero Section
+
+**Description**: The main banner/hero section at the top of the page.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Main heading text
+- `subtitle` (Tiptap JSON): Subheading text
+- `description` (Tiptap JSON): Description text
+- `primaryCta` (object):
+  - `label` (string): Button text
+  - `href` (string): Button link URL
+- `secondaryCta` (object):
+  - `label` (string): Button text
+  - `href` (string): Button link URL
+- `mediaItems` (array): Array of media items (for sliders/carousels)
+  - `type` ('image' | 'video'): Media type
+  - `url` (string): Media URL
+  - `altText` (string): Alt text for accessibility
+- `media` (object): Single media item (alternative to mediaItems)
+  - `type` ('image' | 'video'): Media type
+  - `url` (string): Media URL
+  - `altText` (string): Alt text for accessibility
+
+---
+
+## 2. About Section
+
+**Description**: Company/about information section.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `features` (array): Array of feature highlights
+  - `icon` (string): Icon name/identifier
+  - `label` (string): Feature label
+  - `description` (Tiptap JSON): Feature description
+- `image` (object): About section image
+  - `url` (string): Image URL
+  - `altText` (string): Alt text
+
+---
+
+## 3. Services Section
+
+**Description**: Displays a list of services from the Services collection.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `serviceIds` (array of ObjectId): Array of service IDs to display
+
+---
+
+## 4. Service Highlights Section
+
+**Description**: Featured services with pricing and details.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `highlights` (array): Array of service highlights
+  - `icon` (string): Icon name/identifier
+  - `title` (Tiptap JSON): Service title
+  - `description` (Tiptap JSON): Service description
+  - `price` (string): Service price
+  - `image` (object): Service image
+    - `url` (string): Image URL
+    - `altText` (string): Alt text
+  - `featured` (boolean): Mark as featured
+  - `order` (number): Display order
+- `backgroundColor` (string): Background color
+- `layout` ('grid' | 'carousel' | 'list'): Display layout
+
+---
+
+## 5. Gallery Section
+
+**Description**: Image gallery section.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `images` (array): Array of gallery images
+  - `url` (string): Image URL
+  - `altText` (string): Alt text
+  - `caption` (Tiptap JSON): Image caption
+
+---
+
+## 6. Testimonials Section
+
+**Description**: Customer testimonials/reviews section.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `testimonials` (array): Array of testimonials
+  - `name` (string): Customer name
+  - `role` (string): Customer role/title
+  - `company` (string): Company name
+  - `text` (Tiptap JSON): Testimonial text
+  - `rating` (number): Star rating (1-5)
+  - `avatar` (string): Avatar image URL
+  - `videoUrl` (string): Video testimonial URL
+  - `videoThumbnailUrl` (string): Video thumbnail URL
+
+---
+
+## 7. FAQ Section
+
+**Description**: Frequently Asked Questions section.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `items` (array): Array of FAQ items
+  - `question` (Tiptap JSON): FAQ question
+  - `answer` (Tiptap JSON): FAQ answer
+
+---
+
+## 8. Contact Section
+
+**Description**: Contact form and information section.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `showForm` (boolean): Show contact form
+- `showMap` (boolean): Show map
+- `showContactInfo` (boolean): Show contact information
+
+---
+
+## 9. Blog Section
+
+**Description**: Blog posts listing section.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `postsToShow` (number): Number of posts to display (default: 6)
+- `showExcerpt` (boolean): Show post excerpts
+- `showDate` (boolean): Show post dates
+
+---
+
+## 10. CTA Section
+
+**Description**: Call-to-Action section.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `primaryButton` (object):
+  - `label` (string): Button text
+  - `href` (string): Button link URL
+- `backgroundImage` (string): Background image URL
+- `backgroundColor` (string): Background color
+
+---
+
+## 11. Why Choose Us Section
+
+**Description**: Features/benefits section highlighting why to choose the company.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `items` (array): Array of features
+  - `icon` (string): Icon name/identifier
+  - `title` (Tiptap JSON): Feature title
+  - `description` (Tiptap JSON): Feature description
+
+---
+
+## 12. Company Detail Section
+
+**Description**: Company details and statistics section.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `details` (array): Array of company details
+  - `title` (Tiptap JSON): Detail title
+  - `description` (Tiptap JSON): Detail description
+  - `label` (string): Alternative label
+  - `value` (Tiptap JSON): Alternative value
+  - `image` (object): Detail image
+    - `url` (string): Image URL
+    - `altText` (string): Alt text
+
+---
+
+## 13. Projects Section
+
+**Description**: Portfolio/projects showcase section.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `projects` (array): Array of projects
+  - `title` (Tiptap JSON): Project title
+  - `description` (Tiptap JSON): Project description
+  - `image` (object): Project image
+    - `url` (string): Image URL
+    - `altText` (string): Alt text
+  - `href` (string): Project link URL
+
+---
+
+## 14. CTA 2 Section
+
+**Description**: Secondary Call-to-Action section.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `primaryButton` (object):
+  - `label` (string): Button text
+  - `href` (string): Button link URL
+- `backgroundImage` (string): Background image URL
+- `backgroundColor` (string): Background color
+
+---
+
+## 15. CTA 3 Section
+
+**Description**: Tertiary Call-to-Action section.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable the section
+- `title` (Tiptap JSON): Section title
+- `description` (Tiptap JSON): Section description
+- `primaryButton` (object):
+  - `label` (string): Button text
+  - `href` (string): Button link URL
+- `backgroundImage` (string): Background image URL
+- `backgroundColor` (string): Background color
+
+---
+
+## 16. Footer Overrides
+
+**Description**: Custom footer configuration for the page.
+
+**Fields**:
+- `enabled` (boolean): Toggle to enable/disable footer overrides
+- `links` (array): Array of footer links
+  - `label` (string): Link text
+  - `href` (string): Link URL
+- `copyright` (string): Copyright text
+
+---
+
+## Page Type to Sections Mapping
+
+Different page types have different available sections. Only the sections listed below are available for each page type:
+
+### Home Page
+**Sections**: hero, about, services, gallery, testimonials, faq, contact, blog, cta, whyChooseUs, companyDetail, projects, cta2, cta3, footer
+
+**Description**: Full-featured home page with all sections available.
+
+---
+
+### About Page
+**Sections**: hero, about, whyChooseUs, companyDetail, cta2, footer
+
+**Description**: Company information page with hero, about content, why choose us features, company details, and a CTA section.
+
+---
+
+### Contact Page
+**Sections**: hero, contact, footer
+
+**Description**: Contact page with hero section and contact form/information.
+
+---
+
+### Service List Page
+**Sections**: hero, services, footer
+
+**Description**: Lists all services with hero section.
+
+---
+
+### Blog List Page
+**Sections**: hero, blog, footer
+
+**Description**: Lists blog posts with hero section.
+
+---
+
+### Project Detail Page
+**Sections**: hero, footer
+
+**Description**: Individual project detail page with hero section.
+
+---
+
+### Testimonials Page
+**Sections**: hero, testimonials, footer
+
+**Description**: Dedicated testimonials page with hero section.
+
+---
+
+## Notes
+
+- All text fields that support rich content use Tiptap JSON format
+- All sections have an `enabled` boolean to toggle visibility
+- Image fields support both URL and alt text for accessibility
+- Array fields (features, testimonials, etc.) can have multiple items
+- Media items can be images or videos
+- Background can be set using either an image URL or a color

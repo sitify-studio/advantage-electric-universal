@@ -1,0 +1,9 @@
+{
+  "common": {
+    "home": "Inicio",
+    "blog": "Blog",
+    "projects": "Proyectos",
+    "services": "Servicios",
+    "contact": "Contacto"
+  }
+}

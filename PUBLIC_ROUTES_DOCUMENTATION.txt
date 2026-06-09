@@ -1,0 +1,1068 @@
+# Public API Routes Documentation
+
+This document describes all public API routes that can be used in Next.js templates without authentication.
+
+---
+
+## Base URL
+
+```
+http://localhost:5000/api
+```
+
+---
+
+## CORS Configuration
+
+Public routes have CORS enabled for all origins (`*`) to allow template access from any domain.
+
+---
+
+## Public Routes
+
+### 1. Health Check
+
+**Endpoint**: `GET /api/health`
+
+**Description**: Check if the server is running.
+
+**Authentication**: Not required
+
+**Response**:
+```json
+{
+  "status": "OK",
+  "message": "Server is running"
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/health')
+  .then(res => res.json())
+  .then(data => console.log(data));
+```
+
+---
+
+### 2. Public Site Routes
+
+#### Get Default Site
+
+**Endpoint**: `GET /api/public/sites/default`
+
+**Description**: Get the default site.
+
+**Authentication**: Not required
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "site_id",
+    "name": "Site Name",
+    "slug": "site-slug",
+    "business": { ... },
+    "footer": { ... },
+    "status": "published"
+  }
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/public/sites/default')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+#### Get Site by Slug
+
+**Endpoint**: `GET /api/public/sites/:slug`
+
+**Description**: Get a site by its slug.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `slug` (path param): Site slug
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "site_id",
+    "name": "Site Name",
+    "slug": "site-slug",
+    "business": { ... },
+    "footer": { ... },
+    "status": "published"
+  }
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/public/sites/my-site')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+#### Get Site by ID
+
+**Endpoint**: `GET /api/public/sites/id/:id`
+
+**Description**: Get a site by its ID.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `id` (path param): Site ID (MongoDB ObjectId)
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "site_id",
+    "name": "Site Name",
+    "slug": "site-slug",
+    "business": { ... },
+    "footer": { ... },
+    "status": "published"
+  }
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/public/sites/id/507f1f77bcf86cd799439011')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+### 3. Public Page Routes
+
+#### Get Pages by Site Slug
+
+**Endpoint**: `GET /api/public/sites/:slug/pages`
+
+**Description**: Get all pages for a site by site slug.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `slug` (path param): Site slug
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "page_id",
+      "name": "Home",
+      "pageType": "home",
+      "status": "published",
+      "hero": { ... },
+      "aboutSection": { ... },
+      ...
+    }
+  ]
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/public/sites/my-site/pages')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+#### Get Page by Site Slug and Page Slug
+
+**Endpoint**: `GET /api/public/sites/:slug/pages/:pageSlug`
+
+**Description**: Get a specific page by site slug and page slug.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `slug` (path param): Site slug
+- `pageSlug` (path param): Page slug
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "page_id",
+    "name": "Home",
+    "pageType": "home",
+    "status": "published",
+    "hero": { ... },
+    "aboutSection": { ... },
+    "servicesSection": { ... },
+    ...
+  }
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/public/sites/my-site/pages/home')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+### 4. Public Services Routes
+
+#### Get Services by Site Slug
+
+**Endpoint**: `GET /api/public/sites/:slug/services`
+
+**Description**: Get all published services for a site by site slug.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `slug` (path param): Site slug
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "service_id",
+      "siteId": "site_id",
+      "name": "Service Name",
+      "slug": "service-slug",
+      "description": "...",
+      "shortDescription": "...",
+      "thumbnailImage": {
+        "url": "/api/uploads/image.jpg",
+        "altText": "Alt text"
+      },
+      "galleryImages": [ ... ],
+      "price": "100",
+      "priceType": "fixed",
+      "features": [ ... ],
+      "category": "category",
+      "tags": [ ... ],
+      "seo": { ... },
+      "status": "published"
+    }
+  ]
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/public/sites/my-site/services')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+### 5. Public Blog Routes
+
+#### Get Blog Posts by Site Slug
+
+**Endpoint**: `GET /api/public/sites/:slug/blog`
+
+**Description**: Get all published blog posts for a site by site slug.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `slug` (path param): Site slug
+- `limit` (query param, optional): Number of posts to return
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "post_id",
+      "siteId": "site_id",
+      "title": "Blog Post Title",
+      "slug": "blog-post-slug",
+      "excerpt": "...",
+      "content": "...",
+      "featuredImage": { ... },
+      "author": { ... },
+      "seo": { ... },
+      "status": "published",
+      "publishedAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}
+```
+
+**Usage Example**:
+```javascript
+// Get all posts
+fetch('http://localhost:5000/api/public/sites/my-site/blog')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+
+// Get limited posts
+fetch('http://localhost:5000/api/public/sites/my-site/blog?limit=6')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+#### Get Blog Post by Slug
+
+**Endpoint**: `GET /api/public/sites/:slug/blog/:postSlug`
+
+**Description**: Get a specific blog post by site slug and post slug.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `slug` (path param): Site slug
+- `postSlug` (path param): Blog post slug
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "post_id",
+    "siteId": "site_id",
+    "title": "Blog Post Title",
+    "slug": "blog-post-slug",
+    "excerpt": "...",
+    "content": "...",
+    "featuredImage": { ... },
+    "author": {
+      "userId": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "avatar": "/api/uploads/avatar.jpg"
+      }
+    },
+    "seo": { ... },
+    "status": "published",
+    "publishedAt": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/public/sites/my-site/blog/my-first-post')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+### 6. Public Projects Routes
+
+#### Get Projects by Site Slug
+
+**Endpoint**: `GET /api/public/sites/:slug/projects`
+
+**Description**: Get all published projects for a site by site slug.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `slug` (path param): Site slug
+- `limit` (query param, optional): Number of projects to return
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "project_id",
+      "siteId": "site_id",
+      "title": "Project Title",
+      "slug": "project-slug",
+      "description": "...",
+      "images": [ ... ],
+      "category": "category",
+      "tags": [ ... ],
+      "seo": { ... },
+      "status": "published",
+      "publishedAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}
+```
+
+**Usage Example**:
+```javascript
+// Get all projects
+fetch('http://localhost:5000/api/public/sites/my-site/projects')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+
+// Get limited projects
+fetch('http://localhost:5000/api/public/sites/my-site/projects?limit=6')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+#### Get Project by Slug
+
+**Endpoint**: `GET /api/public/sites/:slug/projects/:projectSlug`
+
+**Description**: Get a specific project by site slug and project slug.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `slug` (path param): Site slug
+- `projectSlug` (path param): Project slug
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "project_id",
+    "siteId": "site_id",
+    "title": "Project Title",
+    "slug": "project-slug",
+    "description": "...",
+    "images": [ ... ],
+    "category": "category",
+    "tags": [ ... ],
+    "seo": { ... },
+    "status": "published",
+    "publishedAt": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/public/sites/my-site/projects/my-project')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+### 7. Public Service Area Pages Routes
+
+#### Get Service Area Pages by Site Slug
+
+**Endpoint**: `GET /api/public/sites/:slug/service-area-pages`
+
+**Description**: Get all service area pages for a site by site slug.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `slug` (path param): Site slug
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "page_id",
+      "siteId": "site_id",
+      "serviceId": {
+        "_id": "service_id",
+        "name": "Service Name",
+        "slug": "service-slug",
+        "serviceAreas": [ ... ]
+      },
+      "slug": "city-slug",
+      "city": "City Name",
+      "state": "State",
+      "hero": { ... },
+      "serviceOverview": { ... },
+      "about": { ... },
+      "cta": { ... },
+      "seo": { ... },
+      "status": "published"
+    }
+  ]
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/public/sites/my-site/service-area-pages')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+#### Get Service Area Page by Slug
+
+**Endpoint**: `GET /api/public/sites/:slug/service-areas/:pageSlug`
+
+**Description**: Get a specific service area page by site slug and page slug.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `slug` (path param): Site slug
+- `pageSlug` (path param): Service area page slug (city slug)
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "page_id",
+    "siteId": {
+      "_id": "site_id",
+      "name": "Site Name",
+      "slug": "site-slug",
+      "footer": { ... },
+      "business": { ... }
+    },
+    "serviceId": {
+      "_id": "service_id",
+      "name": "Service Name",
+      "slug": "service-slug",
+      "serviceAreas": [ ... ]
+    },
+    "slug": "city-slug",
+    "city": "City Name",
+    "state": "State",
+    "hero": { ... },
+    "serviceOverview": { ... },
+    "about": { ... },
+    "cta": { ... },
+    "seo": { ... },
+    "status": "published"
+  }
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/public/sites/my-site/service-areas/new-york')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+#### Get Service Area Page by Service and City
+
+**Endpoint**: `GET /api/public/sites/:slug/service-areas/by-service/:serviceSlug/:citySlug`
+
+**Description**: Get a service area page by site slug, service slug, and city slug.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `slug` (path param): Site slug
+- `serviceSlug` (path param): Service slug
+- `citySlug` (path param): City slug
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "page_id",
+    "siteId": {
+      "_id": "site_id",
+      "name": "Site Name",
+      "slug": "site-slug",
+      "footer": { ... },
+      "business": { ... }
+    },
+    "serviceId": {
+      "_id": "service_id",
+      "name": "Service Name",
+      "slug": "service-slug",
+      "serviceAreas": [ ... ]
+    },
+    "slug": "city-slug",
+    "city": "City Name",
+    "state": "State",
+    "hero": { ... },
+    "serviceOverview": { ... },
+    "about": { ... },
+    "cta": { ... },
+    "seo": { ... },
+    "status": "published"
+  }
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/public/sites/my-site/service-areas/by-service/plumbing/new-york')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+### 8. Public Pages Routes (Alternative)
+
+#### Get All Pages
+
+**Endpoint**: `GET /api/pages`
+
+**Description**: Get all pages (supports query parameter for site filtering).
+
+**Authentication**: Not required
+
+**Query Parameters**:
+- `siteId` (optional): Filter pages by site ID
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "page_id",
+      "name": "Home",
+      "siteId": "site_id",
+      "pageType": "home",
+      "status": "published",
+      ...
+    }
+  ]
+}
+```
+
+**Usage Example**:
+```javascript
+// Get all pages
+fetch('http://localhost:5000/api/pages')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+
+// Get pages by site ID
+fetch('http://localhost:5000/api/pages?siteId=507f1f77bcf86cd799439011')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+#### Get Pages by Site ID
+
+**Endpoint**: `GET /api/pages/site/:siteId`
+
+**Description**: Get all pages for a specific site by site ID.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `siteId` (path param): Site ID
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "page_id",
+      "name": "Home",
+      "siteId": "site_id",
+      "pageType": "home",
+      "status": "published",
+      ...
+    }
+  ]
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/pages/site/507f1f77bcf86cd799439011')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+#### Get Page by ID
+
+**Endpoint**: `GET /api/pages/:id`
+
+**Description**: Get a specific page by ID.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `id` (path param): Page ID
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "page_id",
+    "name": "Home",
+    "siteId": "site_id",
+    "pageType": "home",
+    "status": "published",
+    "hero": { ... },
+    "aboutSection": { ... },
+    ...
+  }
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/pages/507f1f77bcf86cd799439011')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+### 9. Public Testimonials Routes
+
+#### Get All Testimonials
+
+**Endpoint**: `GET /api/testimonials`
+
+**Description**: Get all testimonials.
+
+**Authentication**: Not required
+
+**Query Parameters**:
+- `siteId` (optional): Filter testimonials by site ID
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "testimonial_id",
+      "siteId": "site_id",
+      "name": "John Doe",
+      "role": "CEO",
+      "company": "Company Name",
+      "text": "Testimonial text...",
+      "rating": 5,
+      "avatar": "/api/uploads/avatar.jpg",
+      "status": "published"
+    }
+  ]
+}
+```
+
+**Usage Example**:
+```javascript
+// Get all testimonials
+fetch('http://localhost:5000/api/testimonials')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+
+// Get testimonials by site
+fetch('http://localhost:5000/api/testimonials?siteId=507f1f77bcf86cd799439011')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+#### Get Featured Testimonials
+
+**Endpoint**: `GET /api/testimonials/featured`
+
+**Description**: Get featured testimonials.
+
+**Authentication**: Not required
+
+**Query Parameters**:
+- `siteId` (optional): Filter testimonials by site ID
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "testimonial_id",
+      "siteId": "site_id",
+      "name": "John Doe",
+      "role": "CEO",
+      "company": "Company Name",
+      "text": "Testimonial text...",
+      "rating": 5,
+      "avatar": "/api/uploads/avatar.jpg",
+      "featured": true,
+      "status": "published"
+    }
+  ]
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/testimonials/featured')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+#### Get Testimonial by ID
+
+**Endpoint**: `GET /api/testimonials/:id`
+
+**Description**: Get a specific testimonial by ID.
+
+**Authentication**: Not required
+
+**Parameters**:
+- `id` (path param): Testimonial ID
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "testimonial_id",
+    "siteId": "site_id",
+    "name": "John Doe",
+    "role": "CEO",
+    "company": "Company Name",
+    "text": "Testimonial text...",
+    "rating": 5,
+    "avatar": "/api/uploads/avatar.jpg",
+    "status": "published"
+  }
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/testimonials/507f1f77bcf86cd799439011')
+  .then(res => res.json())
+  .then(data => console.log(data.data));
+```
+
+---
+
+### 10. Contact Form Submission
+
+**Endpoint**: `POST /api/contact`
+
+**Description**: Submit a contact form.
+
+**Authentication**: Not required
+
+**Request Body**:
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "+1234567890",
+  "subject": "Inquiry",
+  "message": "I would like to inquire about your services.",
+  "siteId": "site_id"
+}
+```
+
+**Validation Rules**:
+- `name` (required): Minimum 1 character
+- `email` (required): Valid email format
+- `phone` (optional): Phone number
+- `subject` (optional): Subject line
+- `message` (required): Minimum 1 character
+- `siteId` (optional): Site ID for SMTP configuration lookup
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Contact form submitted successfully"
+}
+```
+
+**Error Response** (No SMTP Config):
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NO_SMTP_CONFIG",
+    "message": "No SMTP configuration is active. Please configure SMTP settings."
+  }
+}
+```
+
+**Usage Example**:
+```javascript
+fetch('http://localhost:5000/api/contact', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name: 'John Doe',
+    email: 'john@example.com',
+    phone: '+1234567890',
+    subject: 'Inquiry',
+    message: 'I would like to inquire about your services.',
+    siteId: '507f1f77bcf86cd799439011'
+  })
+})
+  .then(res => res.json())
+  .then(data => console.log(data));
+```
+
+---
+
+### 11. Static File Serving
+
+#### Upload Files
+
+**Endpoint**: `/uploads/*` and `/api/uploads/*`
+
+**Description**: Serve uploaded static files (images, videos, documents).
+
+**Authentication**: Not required
+
+**CORS Headers**:
+- `Cross-Origin-Resource-Policy: cross-origin`
+- `Cache-Control: no-cache, no-store, must-revalidate`
+- `Pragma: no-cache`
+- `Expires: 0`
+
+**Usage Example**:
+```html
+<img src="http://localhost:5000/api/uploads/image.jpg" alt="Description" />
+```
+
+```javascript
+const imageUrl = 'http://localhost:5000/api/uploads/image.jpg';
+```
+
+---
+
+## Error Response Format
+
+All endpoints return errors in the following format:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Error message description"
+  }
+}
+```
+
+**Common Error Codes**:
+- `NOT_FOUND`: Resource not found
+- `VALIDATION_ERROR`: Request validation failed
+- `INTERNAL_ERROR`: Internal server error
+- `NO_SMTP_CONFIG`: No SMTP configuration found (contact form)
+
+---
+
+## Rate Limiting
+
+- **General API**: 500 requests per 15 minutes (production) / 2000 requests (development)
+- **Auth Endpoints**: 100 requests per 15 minutes (production) / 500 requests (development)
+- **Content Endpoints**: 200 requests per 15 minutes (production) / 1000 requests (development)
+
+Rate limit headers are included in responses:
+- `X-RateLimit-Limit`: Maximum requests per window
+- `X-RateLimit-Remaining`: Remaining requests in current window
+- `X-RateLimit-Reset`: Unix timestamp when rate limit resets
+
+---
+
+## Next.js Integration Example
+
+```javascript
+// lib/api.ts
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+export async function fetchSite(slug: string) {
+  const response = await fetch(`${API_BASE_URL}/public/sites/${slug}`);
+  const data = await response.json();
+  return data.data;
+}
+
+export async function fetchPage(siteSlug: string, pageSlug: string) {
+  const response = await fetch(`${API_BASE_URL}/public/sites/${siteSlug}/pages/${pageSlug}`);
+  const data = await response.json();
+  return data.data;
+}
+
+export async function fetchServices(siteSlug: string) {
+  const response = await fetch(`${API_BASE_URL}/public/sites/${siteSlug}/services`);
+  const data = await response.json();
+  return data.data;
+}
+
+export async function fetchBlogPosts(siteSlug: string, limit?: number) {
+  const url = limit 
+    ? `${API_BASE_URL}/public/sites/${siteSlug}/blog?limit=${limit}`
+    : `${API_BASE_URL}/public/sites/${siteSlug}/blog`;
+  const response = await fetch(url);
+  const data = await response.json();
+  return data.data;
+}
+
+export async function fetchProjects(siteSlug: string, limit?: number) {
+  const url = limit 
+    ? `${API_BASE_URL}/public/sites/${siteSlug}/projects?limit=${limit}`
+    : `${API_BASE_URL}/public/sites/${siteSlug}/projects`;
+  const response = await fetch(url);
+  const data = await response.json();
+  return data.data;
+}
+
+export async function submitContactForm(formData: ContactFormData) {
+  const response = await fetch(`${API_BASE_URL}/contact`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(formData),
+  });
+  return response.json();
+}
+```
+
+---
+
+## Notes
+
+- All public routes are designed for template access and have CORS enabled for all origins
+- Image URLs in responses are normalized to use `/api/uploads/` prefix
+- Site must have `status: 'published'` to be accessible via public routes
+- Services, blog posts, and projects must have `status: 'published'` to be accessible via public routes
+- In development mode, sites with status other than 'archived' are accessible
+- Media URLs are automatically normalized for cross-origin access
