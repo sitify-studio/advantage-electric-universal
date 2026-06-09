@@ -13,9 +13,92 @@ interface FAQSectionProps {
   className?: string;
 }
 
+function FaqItem({
+  question,
+  answer,
+  index,
+  isOpen,
+  visible,
+  accentColor,
+  fonts,
+  onToggle,
+}: {
+  question: string;
+  answer: string;
+  index: number;
+  isOpen: boolean;
+  visible: boolean;
+  accentColor: string;
+  fonts: ReturnType<typeof useSectionTheme>['fonts'];
+  onToggle: () => void;
+}) {
+  return (
+    <div
+      className={cn(
+        'border-t border-slate-200 transition-all duration-700',
+        visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+      )}
+      style={{ transitionDelay: `${index * 60}ms` }}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        className="group flex w-full items-start gap-5 py-6 text-left sm:gap-6 sm:py-7"
+        aria-expanded={isOpen}
+      >
+        <div className="mt-1 flex shrink-0 items-center gap-3">
+          <span
+            className="text-[10px] font-bold uppercase tracking-[0.35em]"
+            style={{ color: accentColor }}
+          >
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          <div className="hidden h-px w-6 sm:block" style={{ backgroundColor: `${accentColor}40` }} />
+        </div>
+
+        <span className="min-w-0 flex-grow">
+          {question && (
+            <h3
+              className={cn(
+                'text-base font-normal tracking-tight text-slate-900 transition-colors sm:text-lg',
+                'group-hover:text-slate-600',
+                isOpen && 'text-slate-900'
+              )}
+              style={{ fontFamily: fonts.heading }}
+            >
+              {question}
+            </h3>
+          )}
+
+          {answer && (
+            <div
+              className={cn(
+                'overflow-hidden transition-all duration-500 ease-in-out',
+                isOpen ? 'mt-4 max-h-96 opacity-100' : 'max-h-0 opacity-0'
+              )}
+            >
+              <p className="max-w-2xl text-sm font-light leading-relaxed text-slate-600 sm:text-base">
+                {answer}
+              </p>
+            </div>
+          )}
+        </span>
+
+        <span
+          className="mt-1 shrink-0 text-lg font-light leading-none text-slate-400 transition-colors duration-300 group-hover:text-slate-900"
+          style={{ color: isOpen ? accentColor : undefined }}
+          aria-hidden
+        >
+          {isOpen ? '−' : '+'}
+        </span>
+      </button>
+    </div>
+  );
+}
+
 export function FAQSection({ faqSection, className }: FAQSectionProps) {
   const theme = useSectionTheme();
-  const { colors } = theme;
+  const { colors, fonts } = theme;
 
   const title = useMemo(() => tiptapToText(faqSection?.title), [faqSection?.title]);
   const description = useMemo(() => tiptapToText(faqSection?.description), [faqSection?.description]);
@@ -30,15 +113,14 @@ export function FAQSection({ faqSection, className }: FAQSectionProps) {
     [faqSection?.items]
   );
 
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
   const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation<HTMLDivElement>({ threshold: 0.1 });
   const { ref: faqRef, visibleItems: faqVisible } = useStaggeredAnimation(questions.length, 80);
 
   if (!faqSection || faqSection.enabled === false) return null;
   if (!title && !description && questions.length === 0) return null;
 
-  const primaryColor = colors.mainText;
-  const secondaryColor = colors.primaryButton;
+  const accentColor = colors.primaryButton;
 
   const toggleQuestion = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -47,101 +129,54 @@ export function FAQSection({ faqSection, className }: FAQSectionProps) {
   return (
     <section
       id="faq"
-      className={cn('relative py-16 sm:py-20 md:py-24 lg:py-40 overflow-hidden', className)}
-      style={{ backgroundColor: primaryColor }}
+      className={cn('relative overflow-hidden bg-[#fcfcfc] pt-12 pb-8 lg:pt-16 lg:pb-10', className)}
     >
-      <div className="absolute top-0 right-0 w-1/2 h-full border-l border-white/[0.03] hidden lg:block" />
+      <div
+        className="pointer-events-none absolute -right-16 top-1/4 h-72 w-72 rounded-full blur-3xl opacity-20"
+        style={{ backgroundColor: accentColor }}
+      />
+      <div
+        className="pointer-events-none absolute -left-20 bottom-0 h-64 w-64 rounded-full blur-[100px] opacity-15"
+        style={{ backgroundColor: accentColor }}
+      />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+      <div className="container relative z-10 mx-auto px-6 lg:px-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
           <div
             ref={titleRef}
-            className={`lg:col-span-4 transition-all duration-1000 ${
-              titleVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'
-            }`}
+            className={cn(
+              'lg:col-span-4 lg:sticky lg:top-24 lg:self-start transition-all duration-1000',
+              titleVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            )}
           >
             <SectionHeading
               eyebrow="Information"
               title={title}
               description={description}
-              variant="dark"
-              descriptionClassName="max-w-xs text-sm font-normal"
+              descriptionClassName="max-w-sm"
             />
-
-            <div className="mt-16 hidden lg:flex items-end gap-1 opacity-20">
-              {[...Array(12)].map((_, i) => (
-                <div key={i} className="w-px bg-white" style={{ height: i % 4 === 0 ? '20px' : '10px' }} />
-              ))}
-            </div>
           </div>
 
           {questions.length > 0 && (
             <div ref={faqRef} className="lg:col-span-8">
-              <div className="divide-y divide-white/10">
+              <div className="border-b border-slate-200">
                 {questions.map((faq, index) => (
-                  <div
+                  <FaqItem
                     key={index}
-                    className={`transition-all duration-1000 ${
-                      faqVisible.includes(index) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-                    }`}
-                  >
-                    <button
-                      onClick={() => toggleQuestion(index)}
-                      className="w-full py-8 flex items-start gap-6 text-left group"
-                    >
-                      <span className="text-xs font-mono mt-1 opacity-40 text-white">
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-
-                      <span className="flex-grow">
-                        {faq.question && (
-                          <h3
-                            className={`text-lg sm:text-xl md:text-2xl font-bold tracking-tight transition-colors duration-300 ${
-                              openIndex === index ? 'text-white' : 'text-white group-hover:text-white'
-                            }`}
-                          >
-                            {faq.question}
-                          </h3>
-                        )}
-
-                        {faq.answer && (
-                          <div
-                            className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                              openIndex === index ? 'max-h-96 opacity-100 mt-6' : 'max-h-0 opacity-0'
-                            }`}
-                          >
-                            <p className="text-white font-light leading-relaxed text-sm sm:text-base max-w-2xl">
-                              {faq.answer}
-                            </p>
-                          </div>
-                        )}
-                      </span>
-
-                      <div className="relative w-6 h-6 mt-1 flex-shrink-0">
-                        <div
-                          className="absolute top-1/2 left-0 w-full h-px bg-current transition-transform duration-500"
-                          style={{
-                            backgroundColor: openIndex === index ? secondaryColor : 'rgba(255,255,255,0.3)',
-                          }}
-                        />
-                        <div
-                          className={`absolute top-0 left-1/2 w-px h-full bg-current transition-transform duration-500 ${
-                            openIndex === index ? 'rotate-90 scale-0' : 'rotate-0'
-                          }`}
-                          style={{ backgroundColor: 'rgba(255,255,255,0.3)' }}
-                        />
-                      </div>
-                    </button>
-                  </div>
+                    question={faq.question}
+                    answer={faq.answer}
+                    index={index}
+                    isOpen={openIndex === index}
+                    visible={faqVisible.includes(index)}
+                    accentColor={accentColor}
+                    fonts={fonts}
+                    onToggle={() => toggleQuestion(index)}
+                  />
                 ))}
               </div>
             </div>
           )}
         </div>
-      </div>
-
-      <div className="absolute bottom-0 left-0 p-12 opacity-[0.02] pointer-events-none select-none">
-        <h2 className="text-[15vw] font-black text-white leading-none">FAQS</h2>
       </div>
     </section>
   );

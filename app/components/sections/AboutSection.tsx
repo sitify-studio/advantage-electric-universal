@@ -66,7 +66,7 @@ function resolveAboutCta(data: Record<string, unknown>): { label: string; href: 
 
 export function AboutSection({ aboutSection, className }: AboutSectionProps) {
   const theme = useSectionTheme();
-  const { colors } = theme;
+  const { colors, fonts } = theme;
 
   const title = useMemo(() => tiptapToText(aboutSection?.title), [aboutSection?.title]);
   const description = useMemo(
@@ -89,78 +89,137 @@ export function AboutSection({ aboutSection, className }: AboutSectionProps) {
     return resolveAboutCta(aboutSection as Record<string, unknown>);
   }, [aboutSection]);
 
-  const { ref: sectionRef, isVisible: sectionVisible } = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 });
+  const { ref: sectionRef, isVisible: sectionVisible } = useScrollAnimation<HTMLDivElement>({ threshold: 0.15 });
+  const { ref: imageRef, isVisible: imageVisible } = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 });
   const { ref: featuresRef, visibleItems } = useStaggeredAnimation(features.length, 100);
 
   if (!aboutSection || aboutSection.enabled === false) return null;
   if (!title && !description && features.length === 0 && !aboutImage) return null;
 
-  const primaryColor = colors.mainText;
-  const secondaryColor = colors.primaryButton;
+  const accentColor = colors.primaryButton;
+  const pageBg = colors.pageBackground;
 
   return (
     <section
       id="about"
       ref={sectionRef}
-      className={cn(
-        'relative min-h-screen w-full overflow-hidden flex items-center',
-        className
-      )}
-      style={{ backgroundColor: colors.pageBackground }}
+      className={cn('relative w-full overflow-hidden py-16 lg:py-0 lg:min-h-screen', className)}
+      style={{ backgroundColor: pageBg }}
     >
-      <div className="flex flex-col pt-20 lg:flex-row w-full min-h-screen">
-        <div className="relative w-full lg:w-1/2 h-[50vh] lg:h-screen overflow-hidden">
+      <div
+        className="pointer-events-none absolute -left-24 top-1/4 h-72 w-72 rounded-full blur-3xl opacity-25"
+        style={{ backgroundColor: accentColor }}
+      />
+      <div
+        className="pointer-events-none absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full blur-[100px] opacity-15"
+        style={{ backgroundColor: accentColor }}
+      />
+
+      <div className="relative z-10 flex w-full flex-col lg:min-h-screen lg:flex-row lg:items-stretch">
+        <div
+          ref={imageRef}
+          className="relative flex w-full flex-col px-6 pt-8 lg:w-1/2 lg:min-h-screen lg:px-12 lg:py-12 lg:pt-12"
+        >
           <div
-            className={`relative w-full h-full transition-transform duration-[1.5s] ease-out ${
-              sectionVisible ? 'scale-100' : 'scale-110'
-            }`}
-          >
-            {aboutImage ? (
-              <Image
-                src={aboutImage}
-                alt={aboutSection.image?.altText?.trim() || title || 'About Us'}
-                fill
-                className="object-cover"
-                priority
-              />
-            ) : (
-              <div className="w-full h-full" style={{ backgroundColor: `${secondaryColor}20` }} />
+            className={cn(
+              'group relative flex-1 transition-all duration-[1.4s] ease-out',
+              imageVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
             )}
+          >
+            <div
+              className="absolute -bottom-5 -right-5 hidden h-full w-full border sm:block"
+              style={{ borderColor: `${accentColor}35` }}
+            />
+
+            <div className="relative aspect-[4/5] overflow-hidden sm:aspect-[5/6] lg:aspect-auto lg:h-full lg:min-h-[420px]">
+              {aboutImage ? (
+                <>
+                  <Image
+                    src={aboutImage}
+                    alt={aboutSection.image?.altText?.trim() || title || 'About Us'}
+                    fill
+                    className={cn(
+                      'object-cover transition-all duration-[2s] ease-out',
+                      'grayscale-[15%] group-hover:grayscale-0 group-hover:scale-[1.04]',
+                      imageVisible ? 'scale-100' : 'scale-110'
+                    )}
+                    priority
+                  />
+                  <div
+                    className="absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
+                    style={{
+                      background: `linear-gradient(135deg, transparent 40%, ${accentColor}18 100%)`,
+                    }}
+                  />
+                </>
+              ) : (
+                <div className="h-full w-full" style={{ backgroundColor: `${accentColor}15` }} />
+              )}
+
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background: `linear-gradient(to right, transparent 55%, ${pageBg} 100%)`,
+                }}
+              />
+
+              <div
+                className={cn(
+                  'absolute left-0 top-0 h-full w-1 origin-top transition-transform duration-[1.2s] ease-out',
+                  imageVisible ? 'scale-y-100' : 'scale-y-0'
+                )}
+                style={{ backgroundColor: accentColor }}
+              />
+            </div>
+
+            <span
+              className={cn(
+                'absolute -left-2 top-6 text-[10px] font-bold uppercase tracking-[0.4em] transition-all duration-1000 delay-300 sm:left-0',
+                imageVisible ? 'opacity-100' : 'opacity-0'
+              )}
+              style={{ color: `${accentColor}80`, writingMode: 'vertical-rl' }}
+            >
+              01
+            </span>
           </div>
         </div>
 
-        <div
-          className="w-full lg:w-1/2 flex items-center px-8 md:px-16 lg:px-24 py-20 lg:py-0"
-          style={{ backgroundColor: colors.pageBackground }}
-        >
+        <div className="flex w-full items-center px-6 py-12 lg:w-1/2 lg:min-h-screen lg:px-12 lg:py-12">
           <div className="max-w-xl">
             <SectionHeading
               eyebrow="Excellence Defined"
               title={title}
               description={description}
-              className={`transition-all duration-1000 delay-200 ${
-                sectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-              descriptionClassName="mb-8 sm:mb-12"
+              className={cn(
+                'transition-all duration-1000 delay-150',
+                sectionVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+              )}
+              descriptionClassName="mb-8 sm:mb-10"
             />
 
             {features.length > 0 && (
-              <div
-                ref={featuresRef}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-3 sm:gap-y-4 mb-8 sm:mb-12"
-              >
+              <div ref={featuresRef} className="mb-8 space-y-0 sm:mb-10">
                 {features.map((feature, i) => (
                   <div
                     key={i}
-                    className={`flex items-center gap-4 transition-all duration-500 ${
-                      visibleItems.includes(i) ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-                    }`}
-                    style={{ transitionDelay: `${i * 100 + 600}ms` }}
+                    className={cn(
+                      'border-t border-slate-200/80 py-4 transition-all duration-700',
+                      visibleItems.includes(i)
+                        ? 'translate-x-0 opacity-100'
+                        : '-translate-x-3 opacity-0'
+                    )}
+                    style={{ transitionDelay: `${i * 80 + 200}ms` }}
                   >
-                    <div className="w-1 h-1 rounded-full" style={{ backgroundColor: secondaryColor }} />
-                    <span className="text-sm text-slate-600 leading-relaxed">
-                      {feature}
-                    </span>
+                    <div className="mb-2 flex items-center gap-3">
+                      <span
+                        className="text-[10px] font-bold uppercase tracking-[0.35em]"
+                        style={{ color: accentColor }}
+                      >
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <div className="h-px w-10" style={{ backgroundColor: `${accentColor}40` }} />
+                    </div>
+                    <span className="text-sm font-light leading-relaxed text-slate-600">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -168,50 +227,27 @@ export function AboutSection({ aboutSection, className }: AboutSectionProps) {
 
             {ctaButton && (
               <div
-                className={`transition-all duration-1000 delay-700 ${
-                  sectionVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
+                className={cn(
+                  'transition-all duration-1000 delay-500',
+                  sectionVisible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+                )}
               >
-                <a
-                  href={ctaButton.href}
-                  className="group relative inline-flex items-center gap-8 sm:gap-12 px-6 sm:px-8 py-4 sm:py-5 border rounded-sm overflow-hidden transition-all duration-500 hover:border-opacity-100"
-                  style={{ borderColor: `${secondaryColor}30` }}
-                >
+                <a href={ctaButton.href} className="group inline-flex items-center gap-4">
                   <span
-                    className="relative z-10 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.3em] transition-colors duration-500 group-hover:text-white"
-                    style={{ color: primaryColor }}
+                    className="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-900 transition-colors group-hover:opacity-70"
+                    style={{ fontFamily: fonts.body }}
                   >
                     {ctaButton.label}
                   </span>
                   <div
-                    className="absolute inset-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"
-                    style={{ backgroundColor: primaryColor }}
+                    className="h-px w-8 transition-all duration-500 group-hover:w-14"
+                    style={{ backgroundColor: accentColor }}
                   />
-                  <svg
-                    className="relative z-10 w-4 h-4 transition-all duration-500 group-hover:translate-x-2"
-                    style={{ color: `${secondaryColor}99` }}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
-                    />
-                  </svg>
                 </a>
               </div>
             )}
           </div>
         </div>
-      </div>
-
-      <div className="absolute left-6 bottom-12 hidden xl:block rotate-180" style={{ writingMode: 'vertical-rl' }}>
-        <span className="text-[10px] uppercase tracking-[0.6em] font-medium" style={{ color: `${secondaryColor}60` }}>
-          Architectural Interior & Design
-        </span>
       </div>
     </section>
   );

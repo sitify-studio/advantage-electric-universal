@@ -166,7 +166,7 @@ export function HeroSection({ hero, className }: HeroSectionProps) {
           <div className="mt-5 relative z-30">
             <Link
               href={ctaButton.href}
-              className="inline-block px-9 py-3.5 text-[11px] font-semibold uppercase tracking-[0.22em] transition-opacity hover:opacity-90"
+              className="inline-block px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] transition-opacity hover:opacity-90"
               style={{
                 backgroundColor: palette.primaryButton,
                 color: palette.textOnDark,
