@@ -327,7 +327,7 @@ export function Header() {
                 alt={businessName || 'Logo'}
                 width={160}
                 height={160}
-                className="h-14 w-14 object-contain sm:h-16 sm:w-16"
+                className="h-[4.25rem] w-auto max-w-[12rem] object-contain sm:h-[4.75rem] sm:max-w-[14rem]"
                 priority
               />
             </Link>
