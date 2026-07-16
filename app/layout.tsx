@@ -1,38 +1,35 @@
-import type { Metadata } from 'next'
-import './globals.css'
-import { WebBuilderProvider } from '@/app/providers/WebBuilderProvider'
-import { ErrorBoundary } from '@/app/components/ui/ErrorBoundary'
-import { ThemeFontWrapper } from './components/ui/ThemeFontWrapper'
-import { LanguageProvider } from '@/app/i18n/LanguageProvider'
-import { LenisProvider } from '@/app/components/cinematic/LenisProvider'
-import { AmbientFoundation } from '@/app/components/cinematic/AmbientFoundation'
-import { HeroIntroProvider } from '@/app/providers/HeroIntroProvider'
-import { Header } from '@/app/components/layout/Header'
+import type { Metadata } from 'next';
+import './globals.css';
+import { WebBuilderProvider } from '@/app/providers/WebBuilderProvider';
+import { ErrorBoundary } from '@/app/components/ui/ErrorBoundary';
+import { ThemeFontWrapper } from './components/ui/ThemeFontWrapper';
+import { LanguageProvider } from '@/app/i18n/LanguageProvider';
+import { LenisProvider } from '@/app/components/cinematic/LenisProvider';
+import { AmbientFoundation } from '@/app/components/cinematic/AmbientFoundation';
+import { HeroIntroProvider } from '@/app/providers/HeroIntroProvider';
+import { Header } from '@/app/components/layout/Header';
+import { fetchSiteBootstrap } from '@/app/lib/siteBootstrap';
 
 export const metadata: Metadata = {
   title: 'Web Builder Site',
   description: 'Generated site using Web Builder',
-}
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const initialData = await fetchSiteBootstrap();
+
   return (
     <html lang="en">
       <body suppressHydrationWarning className="antialiased">
         <ErrorBoundary>
-          <WebBuilderProvider>
+          <WebBuilderProvider initialData={initialData}>
             <LanguageProvider>
               <LenisProvider>
                 <AmbientFoundation />
                 <HeroIntroProvider>
                   <ThemeFontWrapper>
                     <Header />
-                    <main className="relative z-10 min-h-screen pt-14">
-                      {children}
-                    </main>
+                    <main className="relative z-10 min-h-screen pt-[5.75rem]">{children}</main>
                   </ThemeFontWrapper>
                 </HeroIntroProvider>
               </LenisProvider>
@@ -41,5 +38,5 @@ export default function RootLayout({
         </ErrorBoundary>
       </body>
     </html>
-  )
+  );
 }

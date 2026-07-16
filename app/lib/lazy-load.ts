@@ -6,14 +6,8 @@ import React from 'react';
 // Generic dynamic import wrapper with loading state
 export function createLazyComponent(importFunc: () => Promise<{ default: any }>) {
   return dynamic(importFunc, {
-    loading: () => React.createElement('div', { 
-      className: "flex items-center justify-center p-8" 
-    }, 
-      React.createElement('div', { 
-        className: "animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" 
-      })
-    ),
-    ssr: false, // Client-side only for better performance
+    loading: () => null,
+    ssr: false,
   });
 }
 

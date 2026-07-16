@@ -39,33 +39,39 @@ export function Footer() {
 
   const email = site?.business?.email?.trim() || '';
   const address = site?.business?.address;
-  const primaryColor = colors.mainText;
-  const textColor = '#FFFFFF';
+  // Light builder surface so original logo colors stay visible (dark mainText bg hid the logo).
+  const backgroundColor = colors.sectionBackgroundLight || colors.pageBackground;
+  const textColor = colors.mainText;
+  const mutedColor = colors.secondaryText || colors.mainText;
+  const accentColor = colors.primaryButton;
 
   return (
     <footer
       id="contact"
       className="relative pt-20 pb-10 overflow-hidden"
-      style={{ backgroundColor: primaryColor }}
+      style={{
+        backgroundColor,
+        borderTop: `1px solid color-mix(in srgb, ${textColor} 10%, transparent)`,
+      }}
     >
       <div
         className="absolute top-0 right-0 w-1/3 h-full -skew-x-12 translate-x-1/2"
-        style={{ backgroundColor: `${primaryColor}05` }}
+        style={{ backgroundColor: `color-mix(in srgb, ${accentColor} 8%, transparent)` }}
       />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-8 sm:gap-12 mb-16 sm:mb-20">
           <div className="md:col-span-5">
-            <div className="relative w-52 h-16 mb-8">
+            <div className="relative mb-8 h-24 w-72">
               <Image
                 src={logoSrc}
                 alt={businessName || 'Business Name'}
                 fill
-                className="object-contain object-left brightness-0 invert"
+                className="object-contain object-left"
               />
             </div>
             {businessDescription && (
-              <p className="text-sm font-light leading-relaxed max-w-sm opacity-60" style={{ color: textColor }}>
+              <p className="text-sm font-light leading-relaxed max-w-sm" style={{ color: mutedColor }}>
                 {businessDescription}
               </p>
             )}
@@ -78,10 +84,10 @@ export function Footer() {
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold opacity-50 hover:opacity-100 transition-opacity"
+                    className="group flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-bold opacity-60 hover:opacity-100 transition-opacity"
                     style={{ color: textColor }}
                   >
-                    <span className="w-8 h-px transition-all" style={{ backgroundColor: `${textColor}4D` }} />
+                    <span className="w-8 h-px transition-all" style={{ backgroundColor: accentColor }} />
                     {social.platform}
                   </a>
                 ))}
@@ -90,7 +96,7 @@ export function Footer() {
           </div>
 
           <div className="md:col-span-3">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.5em] opacity-40" style={{ color: textColor }}>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.5em]" style={{ color: accentColor }}>
               Navigation
             </h4>
             <nav className="flex flex-col gap-4 mt-6">
@@ -108,22 +114,26 @@ export function Footer() {
           </div>
 
           <div className="md:col-span-4">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.5em] opacity-40" style={{ color: textColor }}>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.5em]" style={{ color: accentColor }}>
               Contact
             </h4>
             <div className="space-y-6 text-sm font-light mt-6" style={{ color: textColor }}>
               {email && (
                 <div>
-                  <p className="opacity-40 text-[10px] uppercase tracking-[0.3em] mb-1">Inquiries</p>
-                  <a href={`mailto:${email}`} className="transition-colors" style={{ color: textColor }}>
+                  <p className="text-[10px] uppercase tracking-[0.3em] mb-1" style={{ color: mutedColor }}>
+                    Inquiries
+                  </p>
+                  <a href={`mailto:${email}`} className="transition-opacity hover:opacity-70" style={{ color: textColor }}>
                     {email}
                   </a>
                 </div>
               )}
               {address && (address.street || address.city || address.state || address.zipCode) && (
                 <div>
-                  <p className="opacity-40 text-[10px] uppercase tracking-widest mb-1">Office</p>
-                  <address className="not-italic opacity-70">
+                  <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: mutedColor }}>
+                    Office
+                  </p>
+                  <address className="not-italic" style={{ color: mutedColor }}>
                     {address.street && (
                       <>
                         {address.street}
@@ -141,20 +151,20 @@ export function Footer() {
 
         <div
           className="pt-8 sm:pt-10 flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6"
-          style={{ borderTop: `1px solid ${textColor}1A` }}
+          style={{ borderTop: `1px solid color-mix(in srgb, ${textColor} 12%, transparent)` }}
         >
-          <p className="text-[10px] uppercase tracking-[0.5em] opacity-40" style={{ color: textColor }}>
+          <p className="text-[10px] uppercase tracking-[0.5em]" style={{ color: mutedColor }}>
             {copyright || `© ${new Date().getFullYear()} ${businessName}`}
           </p>
 
           <div
-            className="flex items-center gap-8 text-[10px] uppercase tracking-[0.5em] opacity-40"
-            style={{ color: textColor }}
+            className="flex items-center gap-8 text-[10px] uppercase tracking-[0.5em]"
+            style={{ color: mutedColor }}
           >
-            <Link href="/privacy-policy" className="hover:opacity-100 transition-opacity">
+            <Link href="/privacy-policy" className="hover:opacity-70 transition-opacity">
               Privacy Policy
             </Link>
-            <Link href="/terms-of-service" className="hover:opacity-100 transition-opacity">
+            <Link href="/terms-of-service" className="hover:opacity-70 transition-opacity">
               Terms of Service
             </Link>
           </div>

@@ -51,9 +51,7 @@ export default function BlogPostPage() {
         if (!siteLoading) loadPost();
     }, [site, postSlug, siteLoading]);
 
-    if (siteLoading || loading) {
-        return <div className="min-h-screen flex items-center justify-center animate-pulse uppercase tracking-[0.3em] text-xs">Loading Perspective...</div>;
-    }
+    if (siteLoading || loading) return null;
 
     if (error || !post) {
         return <div className="min-h-screen flex items-center justify-center text-red-500 uppercase tracking-widest">Entry Not Found</div>;

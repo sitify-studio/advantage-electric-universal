@@ -309,7 +309,7 @@ const EXTRA_FOOTER_NAV: { slug: string; href: string; defaultName: string }[] = 
 ];
 
 /** All published pages for footer Explore — same on every route (ignores per-page footer link overrides). */
-export function getFooterNavLinks(pages?: Page[]): FooterNavLink[] {
+export function getPublishedPageNavLinks(pages?: Page[]): FooterNavLink[] {
   const published = pages?.filter((p) => p.status === 'published' && p.name?.trim()) ?? [];
   const orderedPages: Page[] = [];
   const seenIds = new Set<string>();
@@ -345,13 +345,24 @@ export function getFooterNavLinks(pages?: Page[]): FooterNavLink[] {
     links.push({ id: page._id, label: page.name.trim(), href });
   }
 
+  return links;
+}
+
+/** All published pages for footer Explore — same on every route (ignores per-page footer link overrides). */
+export function getFooterNavLinks(pages?: Page[]): FooterNavLink[] {
+  const links = getPublishedPageNavLinks(pages);
+  const seenHrefs = new Set(links.map((l) => l.href));
+  const published = pages?.filter((p) => p.status === 'published' && p.name?.trim()) ?? [];
+
   for (const extra of EXTRA_FOOTER_NAV) {
     if (seenHrefs.has(extra.href)) continue;
     const cmsPage = published.find((p) => normalizePageSlug(p.slug) === extra.slug);
+    // Only add extras when a real CMS page exists — never hardcode empty routes.
+    if (!cmsPage) continue;
     links.push({
-      id: cmsPage?._id ?? `nav-${extra.slug}`,
-      label: cmsPage?.name?.trim() || extra.defaultName,
-      href: cmsPage ? getPageHref(cmsPage) : extra.href,
+      id: cmsPage._id,
+      label: cmsPage.name.trim(),
+      href: getPageHref(cmsPage),
     });
     seenHrefs.add(extra.href);
   }
@@ -359,9 +370,9 @@ export function getFooterNavLinks(pages?: Page[]): FooterNavLink[] {
   return links;
 }
 
-/** Header nav uses the same published page routes as the footer (includes home). */
+/** Header nav: only published CMS pages (no hardcoded routes). */
 export function getHeaderNavLinks(pages?: Page[]): FooterNavLink[] {
-  return getFooterNavLinks(pages);
+  return getPublishedPageNavLinks(pages).filter((link) => link.href !== '/');
 }
 
 /** Page-based header entries with optional serving-areas dropdown after Services. */
@@ -379,13 +390,12 @@ export function buildHeaderNavEntries(
   if (!options?.includeServingAreas) return entries;
 
   const servicePage = pages?.find((p) => p.pageType === 'service-list' && p.status === 'published');
-  const servicesIdx = servicePage
-    ? entries.findIndex((e) => e.kind === 'anchor' && e.id === servicePage._id)
-    : entries.findIndex((e) => e.kind === 'anchor' && e.href === '/services');
+  if (!servicePage) return entries;
 
-  const insertAt = servicesIdx >= 0 ? servicesIdx + 1 : entries.length;
-  entries.splice(insertAt, 0, { kind: 'serving-areas' });
+  const servicesIdx = entries.findIndex((e) => e.kind === 'anchor' && e.id === servicePage._id);
+  if (servicesIdx < 0) return entries;
 
+  entries.splice(servicesIdx + 1, 0, { kind: 'serving-areas' });
   return entries;
 }
 

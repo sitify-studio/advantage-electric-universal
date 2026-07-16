@@ -7,13 +7,13 @@ import { HeroSection } from '@/app/components/sections/HeroSection';
 import { Footer } from '@/app/components/layout/Footer';
 
 export default function ContactPage() {
-  const { pages, loading } = useWebBuilder();
+  const { pages } = useWebBuilder();
   const contactPage = pages.find((p: Page) => p.pageType === 'contact');
 
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
-        {!loading && contactPage && (
+        {contactPage && (
           <>
             <HeroSection hero={contactPage.hero} />
             <ContactSection contactSection={contactPage.contactSection} />

@@ -6,50 +6,47 @@ import { Footer } from '@/app/components/layout/Footer';
 import { HeroSection } from '@/app/components/sections/HeroSection';
 import { ServicesSection } from '@/app/components/sections/ServicesSection';
 import { getThemeColors } from '@/app/lib/themeBuilder';
-import { PageContentLoader } from '@/app/components/ui/PageContentLoader';
 
 export default function ServicesPage() {
   const { site, pages, loading, error } = useWebBuilder();
 
   const themeColors = getThemeColors(site);
-
-  // Get theme fonts from site
   const themeFonts = {
     heading: site?.theme?.headingFont,
     body: site?.theme?.bodyFont,
   };
 
-  if (loading) {
-    return <PageContentLoader />;
-  }
+  const displayPage = pages.find((p: Page) => p.pageType === 'service-list');
 
-  if (error && !site) {
+  if (loading && !displayPage) return null;
+
+  if (error && !site && !loading) {
     return (
-      <div 
+      <div
         className="min-h-screen flex items-center justify-center p-4"
         style={{ backgroundColor: themeColors.pageBackground }}
       >
-        <div 
+        <div
           className="p-6 rounded-lg max-w-lg text-center"
-          style={{ 
+          style={{
             backgroundColor: themeColors.cardBackground,
             borderColor: themeColors.inactive,
-            borderWidth: '1px'
+            borderWidth: '1px',
           }}
         >
-          <h2 
+          <h2
             className="text-xl font-bold mb-2"
-            style={{ 
+            style={{
               color: themeColors.secondary,
-              fontFamily: themeFonts.heading
+              fontFamily: themeFonts.heading,
             }}
           >
             Error
           </h2>
-          <p 
-            style={{ 
+          <p
+            style={{
               color: themeColors.secondary,
-              fontFamily: themeFonts.body
+              fontFamily: themeFonts.body,
             }}
           >
             {error}
@@ -59,49 +56,20 @@ export default function ServicesPage() {
     );
   }
 
-  const displayPage = pages.find((p: Page) => p.pageType === 'service-list');
-
-  if (!displayPage) {
-    return (
-      <div 
-        className="min-h-screen flex flex-col items-center justify-center p-4"
-        style={{ backgroundColor: themeColors.pageBackground }}
-      >
-        <h2 
-          className="text-2xl font-bold mb-4"
-          style={{ 
-            color: themeColors.mainText,
-            fontFamily: themeFonts.heading
-          }}
-        >
-          No Services Page Found
-        </h2>
-        <p 
-          style={{ 
-            color: themeColors.secondaryText,
-            fontFamily: themeFonts.body
-          }}
-        >
-          Please create a page with type &quot;services&quot; in the site builder.
-        </p>
-      </div>
-    );
-  }
+  if (!displayPage) return null;
 
   return (
-    <div 
+    <div
       className="min-h-screen selection:bg-black/10 selection:text-inherit"
-      style={{ 
+      style={{
         backgroundColor: themeColors.pageBackground,
-        fontFamily: themeFonts.body
+        fontFamily: themeFonts.body,
       }}
     >
-
       <main>
         <HeroSection hero={displayPage.hero} page={displayPage} />
         <ServicesSection servicesSection={displayPage.servicesSection} />
       </main>
-
       <Footer />
     </div>
   );

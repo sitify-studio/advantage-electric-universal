@@ -16,7 +16,7 @@ export default function GalleryPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#030306]">
       <main className="flex-1">
-        {!loading && galleryPage && (
+        {galleryPage && (
           <>
             <HeroSection hero={galleryPage.hero} />
             <GallerySection gallerySection={galleryPage.gallerySection} />
@@ -24,7 +24,9 @@ export default function GalleryPage() {
         )}
         {!loading && !galleryPage && (
           <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center text-white/60">
-            <p className="max-w-md text-sm uppercase tracking-[0.35em]">Publish a page with an enabled gallery section to populate this route.</p>
+            <p className="max-w-md text-sm uppercase tracking-[0.35em]">
+              Publish a page with an enabled gallery section to populate this route.
+            </p>
           </div>
         )}
       </main>

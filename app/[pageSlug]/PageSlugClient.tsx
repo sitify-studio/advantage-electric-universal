@@ -23,7 +23,6 @@ import { BlogSection } from '@/app/components/sections/BlogSection';
 import { ServingAreasSection } from '@/app/components/sections/ServingAreasSection';
 import api from '@/app/lib/fetch-api';
 import { Page, ServiceAreaPage } from '@/app/lib/types';
-import { PageContentLoader } from '@/app/components/ui/PageContentLoader';
 
 interface PageSlugClientProps {
   pageSlug: string;
@@ -74,11 +73,11 @@ export default function PageSlugClient({ pageSlug: pageSlugProp }: PageSlugClien
     }
   }, [pageSlug, pages, loading, setCurrentPage, loadServiceAreaPage]);
 
-  if (loading || serviceAreaLoading) {
-    return <PageContentLoader />;
-  }
-
   const displayPage = currentPage || serviceAreaPage;
+
+  if (loading || serviceAreaLoading) {
+    if (!displayPage) return null;
+  }
 
   if (!displayPage) {
     return (

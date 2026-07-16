@@ -9,7 +9,6 @@ import { useWebBuilder } from '@/app/providers/WebBuilderProvider';
 import { useScrollAnimation } from '@/app/hooks/useScrollAnimation';
 import { useSectionTheme } from '@/app/hooks/useSectionTheme';
 import { SectionHeading } from '@/app/components/ui/SectionHeading';
-import { CardLoader } from '@/app/components/ui/SkeletonLoader';
 import { tiptapToText } from '@/app/lib/seo';
 
 type BlogSectionInput = NonNullable<Page['blogSection']> & {
@@ -175,31 +174,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ blogSection, className
   const displayPosts = blogPosts.slice(0, count);
   const showExcerpt = Boolean(sectionData.showExcerpt);
 
-  if (loading && blogPosts.length === 0) {
-    return (
-      <section
-        className={cn('relative pt-12 lg:pt-16 pb-8 lg:pb-10', className)}
-        id="blog"
-        style={{ backgroundColor: colors.pageBackground, fontFamily: fonts.body }}
-      >
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="mb-8 lg:mb-10 max-w-3xl space-y-4">
-            <div className="h-3 w-24 animate-pulse rounded bg-slate-200" />
-            <div className="h-8 w-2/3 max-w-md animate-pulse rounded bg-slate-200" />
-            <div className="h-4 w-full max-w-sm animate-pulse rounded bg-slate-200" />
-          </div>
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="space-y-4">
-                <div className="aspect-[4/3] animate-pulse rounded-lg bg-slate-200" />
-                <CardLoader />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
+  if (loading && blogPosts.length === 0) return null;
 
   if (displayPosts.length === 0 && !hasTitle && !hasDescription) return null;
 

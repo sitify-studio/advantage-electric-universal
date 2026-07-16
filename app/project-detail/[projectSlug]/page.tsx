@@ -50,9 +50,7 @@ export default function ProjectDetailPage() {
     if (!siteLoading) loadProjectPage();
   }, [site, siteLoading, projectSlug]);
 
-  if (siteLoading || loading) {
-    return <div className="min-h-screen flex items-center justify-center animate-pulse uppercase tracking-[0.3em] text-xs" style={{ backgroundColor: themeColors.pageBackground }}>Loading Experience...</div>;
-  }
+  if (siteLoading || loading) return null;
 
   if (error || !project) {
     return <div className="min-h-screen flex items-center justify-center text-red-500 uppercase tracking-widest">Project Not Found</div>;

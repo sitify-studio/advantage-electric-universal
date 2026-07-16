@@ -7,13 +7,13 @@ import { HeroSection } from '@/app/components/sections/HeroSection';
 import { BlogSection } from '@/app/components/sections/BlogSection';
 
 export default function BlogPage() {
-  const { pages, loading } = useWebBuilder();
+  const { pages } = useWebBuilder();
   const blogPage = pages.find((p: Page) => p.pageType === 'blog-list');
 
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
-        {!loading && blogPage && (
+        {blogPage && (
           <>
             <HeroSection hero={blogPage.hero} />
             <BlogSection blogSection={blogPage.blogSection} />

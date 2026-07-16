@@ -8,7 +8,7 @@ import { TestimonialsSection } from '@/app/components/sections/TestimonialsSecti
 import { findTestimonialsPage } from '@/app/lib/siteContent';
 
 export default function TestimonialsPage() {
-  const { pages, loading } = useWebBuilder();
+  const { pages } = useWebBuilder();
 
   const testimonialsPage = useMemo(() => findTestimonialsPage(pages), [pages]);
   const homePage = useMemo(() => pages.find((p) => p.pageType === 'home'), [pages]);
@@ -20,14 +20,8 @@ export default function TestimonialsPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1">
-        {!loading && (
-          <>
-            {testimonialsPage?.hero && (
-              <HeroSection hero={testimonialsPage.hero} />
-            )}
-            <TestimonialsSection testimonialsSection={testimonialsSection} />
-          </>
-        )}
+        {testimonialsPage?.hero && <HeroSection hero={testimonialsPage.hero} />}
+        <TestimonialsSection testimonialsSection={testimonialsSection} />
       </main>
       <Footer />
     </div>

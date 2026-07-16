@@ -18,16 +18,7 @@ export default function ServiceClient({ serviceSlug: serviceSlugProp }: ServiceC
   
   const service = services.find((s: any) => s.slug === serviceSlug);
   
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading service...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return null;
   
   if (error) {
     return (

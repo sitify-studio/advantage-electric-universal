@@ -10,6 +10,7 @@ import {
   getBrandName,
   getBusinessTagline,
   buildHeaderNavEntries,
+  getPageHref,
   type HomeHeaderNavEntry,
 } from '@/app/lib/siteContent';
 import {
@@ -20,6 +21,7 @@ import {
   normalizeSlug,
   resolveServiceSlug,
 } from '@/app/lib/serviceAreaSlugs';
+import { buildSectionPalette } from '@/app/lib/sectionPalette';
 import { cn, getImageSrc } from '@/app/lib/utils';
 
 type ServiceArea = { city: string; region: string };
@@ -126,22 +128,27 @@ function NavLink({
   href,
   children,
   accentColor,
+  textColor,
+  fontFamily,
   onClick,
 }: {
   href: string;
   children: ReactNode;
   accentColor: string;
+  textColor: string;
+  fontFamily?: string;
   onClick?: () => void;
 }) {
   return (
     <Link
       href={href}
       onClick={onClick}
-      className="group relative text-[10px] font-bold uppercase tracking-[0.3em] text-slate-600 transition-colors hover:text-slate-900"
+      className="group relative text-[10px] font-bold uppercase tracking-[0.4em] transition-opacity hover:opacity-70"
+      style={{ color: textColor, fontFamily }}
     >
       {children}
       <span
-        className="absolute -bottom-2 left-0 h-px w-0 transition-all duration-500 group-hover:w-full"
+        className="absolute -bottom-2 left-1/2 h-px w-0 -translate-x-1/2 transition-all duration-500 group-hover:w-full"
         style={{ backgroundColor: accentColor }}
       />
     </Link>
@@ -151,7 +158,8 @@ function NavLink({
 export function Header() {
   const { site, pages, services, serviceAreaPages } = useWebBuilder();
   const theme = useSectionTheme();
-  const { colors, fonts } = theme;
+  const { fonts } = theme;
+  const palette = useMemo(() => buildSectionPalette(site), [site]);
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeServiceIndex, setActiveServiceIndex] = useState<number | null>(0);
@@ -180,7 +188,14 @@ export function Header() {
     [pages, servingAreaGroups.length]
   );
 
-  const accentColor = colors.primaryButton;
+  const contactHref = useMemo(() => {
+    const contactPage = pages.find((p) => p.status === 'published' && p.pageType === 'contact');
+    return contactPage ? getPageHref(contactPage) : null;
+  }, [pages]);
+
+  const accent = palette.primaryButton;
+  const text = palette.text;
+  const subtext = palette.subtext;
 
   useEffect(() => {
     setIsMounted(true);
@@ -217,11 +232,12 @@ export function Header() {
       <div className={cn('group relative py-3', className)}>
         <button
           type="button"
-          className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-600 transition-colors group-hover:text-slate-900"
+          className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.4em] transition-opacity group-hover:opacity-70"
+          style={{ color: text, fontFamily: fonts.body }}
         >
           Areas
           <svg
-            className="h-2.5 w-2.5 opacity-50 transition-transform duration-300 group-hover:rotate-180"
+            className="h-2.5 w-2.5 opacity-40 transition-transform duration-300 group-hover:rotate-180"
             viewBox="0 0 12 12"
             fill="currentColor"
           >
@@ -230,24 +246,31 @@ export function Header() {
         </button>
 
         <div className="invisible absolute left-1/2 top-full z-50 w-[min(100vw-3rem,640px)] -translate-x-1/2 pt-3 opacity-0 transition-all duration-300 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-          <div className="flex overflow-hidden border border-slate-200 bg-white">
-            <div className="w-[36%] shrink-0 border-r border-slate-200 py-2">
+          <div
+            className="flex overflow-hidden"
+            style={{
+              background: `linear-gradient(180deg, ${palette.bgTop} 0%, ${palette.bgBottom} 100%)`,
+              border: `1px solid color-mix(in srgb, ${text} 10%, transparent)`,
+            }}
+          >
+            <div
+              className="w-[36%] shrink-0 py-2"
+              style={{ borderRight: `1px solid color-mix(in srgb, ${text} 10%, transparent)` }}
+            >
               {servingAreaGroups.map((group, idx) => (
                 <button
                   key={group.serviceSlug}
                   type="button"
                   onMouseEnter={() => setActiveServiceIndex(idx)}
-                  className={cn(
-                    'w-full px-4 py-3 text-left text-[9px] font-bold uppercase tracking-[0.26em] transition-colors',
-                    activeServiceIndex === idx
-                      ? 'text-slate-900'
-                      : 'text-slate-400 hover:text-slate-600'
-                  )}
+                  className="w-full px-4 py-3 text-left text-[9px] font-bold uppercase tracking-[0.28em] transition-opacity"
                   style={{
+                    color: activeServiceIndex === idx ? text : subtext,
+                    opacity: activeServiceIndex === idx ? 1 : 0.7,
                     borderLeft:
                       activeServiceIndex === idx
-                        ? `2px solid ${accentColor}`
+                        ? `2px solid ${accent}`
                         : '2px solid transparent',
+                    fontFamily: fonts.body,
                   }}
                 >
                   {group.label}
@@ -266,9 +289,10 @@ export function Header() {
                         area,
                         serviceAreaPages
                       )}
-                      className="group/area inline-flex items-center gap-2.5 text-[10px] font-medium uppercase tracking-[0.2em] text-slate-500 transition-colors hover:text-slate-900"
+                      className="group/area inline-flex items-center gap-2.5 text-[10px] font-medium uppercase tracking-[0.22em] transition-opacity hover:opacity-70"
+                      style={{ color: subtext, fontFamily: fonts.body }}
                     >
-                      <span className="text-[10px] text-slate-300 transition-colors group-hover/area:text-slate-900">
+                      <span className="opacity-40 transition-opacity group-hover/area:opacity-100" style={{ color: accent }}>
                         +
                       </span>
                       {area.city}
@@ -285,32 +309,43 @@ export function Header() {
   return (
     <>
       <header
-        className={cn(
-          'fixed inset-x-0 top-0 z-[100] transition-all duration-500',
-          scrolled
-            ? 'border-b border-slate-200/80 bg-white/95 backdrop-blur-md shadow-[0_8px_30px_-20px_rgba(0,0,0,0.15)]'
-            : 'bg-transparent'
-        )}
+        className="fixed inset-x-0 top-0 z-[100] transition-all duration-500"
+        style={{
+          background: scrolled
+            ? `color-mix(in srgb, ${palette.bgTop} 92%, transparent)`
+            : `linear-gradient(180deg, ${palette.bgTop} 0%, color-mix(in srgb, ${palette.bgTop} 55%, transparent) 100%)`,
+          backdropFilter: scrolled ? 'blur(12px)' : undefined,
+          WebkitBackdropFilter: scrolled ? 'blur(12px)' : undefined,
+          borderBottom: scrolled
+            ? `1px solid color-mix(in srgb, ${text} 8%, transparent)`
+            : '1px solid transparent',
+        }}
       >
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="grid h-14 grid-cols-[auto_1fr_auto] items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
-            <Link href="/" className="flex min-w-0 items-center gap-3 group">
+        <div className="mx-auto w-full max-w-[90rem] px-6 md:px-12 lg:px-16 xl:px-20">
+          <div className="grid h-[5.75rem] grid-cols-[auto_1fr_auto] items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
+            <Link href="/" className="group flex min-w-0 items-center gap-3">
               <Image
                 src={logoImage}
                 alt={businessName || 'Logo'}
-                width={80}
-                height={80}
-                className="h-9 w-9 shrink-0 object-contain lg:h-10 lg:w-10"
+                width={192}
+                height={192}
+                className="h-20 w-20 shrink-0 object-contain lg:h-24 lg:w-24"
               />
-              <div className="min-w-0 border-l border-slate-200/80 pl-3">
-                <span
-                  className="block truncate text-[10px] font-bold uppercase tracking-[0.28em] text-slate-900"
-                  style={{ fontFamily: fonts.heading }}
-                >
-                  {businessName || 'Brand'}
-                </span>
+              <div className="min-w-0">
+                <div className="mb-1 flex items-center gap-2.5">
+                  <div className="h-px w-6 shrink-0" style={{ backgroundColor: accent }} />
+                  <span
+                    className="block truncate text-[10px] font-bold uppercase tracking-[0.4em]"
+                    style={{ color: text, fontFamily: fonts.heading }}
+                  >
+                    {businessName || 'Brand'}
+                  </span>
+                </div>
                 {tagline && (
-                  <span className="mt-0.5 hidden truncate text-[8px] font-medium uppercase tracking-[0.34em] text-slate-500 sm:block">
+                  <span
+                    className="hidden truncate pl-[34px] text-[8px] font-medium uppercase tracking-[0.34em] sm:block"
+                    style={{ color: subtext, fontFamily: fonts.body }}
+                  >
                     {tagline}
                   </span>
                 )}
@@ -320,7 +355,13 @@ export function Header() {
             <nav className="hidden items-center justify-center gap-8 lg:flex">
               {homeNavEntries.map((entry) =>
                 entry.kind === 'anchor' ? (
-                  <NavLink key={entry.id} href={entry.href} accentColor={accentColor}>
+                  <NavLink
+                    key={entry.id}
+                    href={entry.href}
+                    accentColor={accent}
+                    textColor={text}
+                    fontFamily={fonts.body}
+                  >
                     {entry.name}
                   </NavLink>
                 ) : (
@@ -329,24 +370,32 @@ export function Header() {
               )}
             </nav>
 
-            <div className="flex items-center justify-end gap-4">
+            <div className="flex items-center justify-end gap-3">
               {phoneNumber && (
                 <Link
                   href={`tel:${phoneNumber.replace(/\s/g, '')}`}
-                  className="group hidden items-center gap-3 lg:inline-flex"
+                  className="hidden px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] transition-opacity hover:opacity-90 lg:inline-block"
+                  style={{
+                    backgroundColor: accent,
+                    color: palette.textOnDark,
+                    fontFamily: fonts.body,
+                  }}
                 >
-                  <div className="text-right">
-                    <span className="block text-[8px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                      Direct Line
-                    </span>
-                    <span className="text-[10px] font-medium tracking-[0.12em] text-slate-700">
-                      {phoneNumber}
-                    </span>
-                  </div>
-                  <div
-                    className="h-px w-6 transition-all duration-500 group-hover:w-10"
-                    style={{ backgroundColor: accentColor }}
-                  />
+                  {phoneNumber}
+                </Link>
+              )}
+
+              {!phoneNumber && contactHref && (
+                <Link
+                  href={contactHref}
+                  className="hidden px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] transition-opacity hover:opacity-90 lg:inline-block"
+                  style={{
+                    backgroundColor: accent,
+                    color: palette.textOnDark,
+                    fontFamily: fonts.body,
+                  }}
+                >
+                  Contact
                 </Link>
               )}
 
@@ -359,21 +408,24 @@ export function Header() {
                 <div className="flex w-7 flex-col items-end gap-1.5">
                   <span
                     className={cn(
-                      'block h-px w-7 bg-slate-900 transition-all duration-500',
+                      'block h-px w-7 transition-all duration-500',
                       isOpen && 'translate-y-[5px] rotate-45'
                     )}
+                    style={{ backgroundColor: text }}
                   />
                   <span
                     className={cn(
-                      'block h-px bg-slate-900 transition-all duration-500',
+                      'block h-px transition-all duration-500',
                       isOpen ? 'w-0 opacity-0' : 'w-5'
                     )}
+                    style={{ backgroundColor: text }}
                   />
                   <span
                     className={cn(
-                      'block h-px bg-slate-900 transition-all duration-500',
+                      'block h-px transition-all duration-500',
                       isOpen ? 'w-7 -translate-y-[5px] -rotate-45' : 'w-3'
                     )}
+                    style={{ backgroundColor: text }}
                   />
                 </div>
               </button>
@@ -384,30 +436,33 @@ export function Header() {
 
       <div
         className={cn(
-          'fixed inset-0 z-[105] bg-white transition-all duration-500 lg:hidden',
-          isOpen ? 'visible opacity-100' : 'invisible opacity-0 pointer-events-none'
+          'fixed inset-0 z-[105] transition-all duration-500 lg:hidden',
+          isOpen ? 'visible opacity-100' : 'invisible pointer-events-none opacity-0'
         )}
+        style={{
+          background: `linear-gradient(180deg, ${palette.bgTop} 0%, ${palette.bgBottom} 100%)`,
+        }}
       >
-        <div className="flex h-full flex-col px-6 pb-10 pt-20">
-          <div className="mb-8 flex items-center gap-3">
-            <div className="h-px w-8" style={{ backgroundColor: accentColor }} />
+        <div className="flex h-full flex-col px-6 pb-10 pt-24">
+          <div className="mb-10 flex items-center gap-3">
+            <div className="h-px w-10" style={{ backgroundColor: accent }} />
             <span
-              className="text-[10px] font-bold uppercase tracking-[0.4em]"
-              style={{ color: accentColor }}
+              className="text-[10px] font-bold uppercase tracking-[0.5em]"
+              style={{ color: accent, fontFamily: fonts.body }}
             >
               Menu
             </span>
           </div>
 
-          <nav className="flex flex-1 flex-col gap-6">
+          <nav className="flex flex-1 flex-col gap-7">
             {homeNavEntries.map((entry) =>
               entry.kind === 'anchor' ? (
                 <Link
                   key={entry.id}
                   href={entry.href}
                   onClick={closeMenu}
-                  className="text-2xl font-light tracking-tight text-slate-900"
-                  style={{ fontFamily: fonts.heading }}
+                  className="text-[clamp(1.65rem,5vw,2.25rem)] font-normal tracking-tight"
+                  style={{ fontFamily: fonts.heading, color: text }}
                 >
                   {entry.name}
                 </Link>
@@ -417,21 +472,27 @@ export function Header() {
                     <button
                       type="button"
                       onClick={() => setMobileAreasOpen((open) => !open)}
-                      className="flex w-full items-center justify-between text-2xl font-light tracking-tight text-slate-900"
-                      style={{ fontFamily: fonts.heading }}
+                      className="flex w-full items-center justify-between text-[clamp(1.65rem,5vw,2.25rem)] font-normal tracking-tight"
+                      style={{ fontFamily: fonts.heading, color: text }}
                     >
                       Areas
-                      <span className="text-sm text-slate-400">{mobileAreasOpen ? '−' : '+'}</span>
+                      <span className="text-sm" style={{ color: subtext }}>
+                        {mobileAreasOpen ? '−' : '+'}
+                      </span>
                     </button>
 
                     {mobileAreasOpen && (
-                      <div className="mt-4 space-y-6 border-t border-slate-200 pt-4">
+                      <div
+                        className="mt-5 space-y-6 pt-5"
+                        style={{ borderTop: `1px solid color-mix(in srgb, ${text} 12%, transparent)` }}
+                      >
                         {servingAreaGroups.map((group) => (
                           <div key={group.serviceSlug}>
                             <Link
                               href={group.href}
                               onClick={closeMenu}
-                              className="mb-3 block text-[10px] font-bold uppercase tracking-[0.28em] text-slate-900"
+                              className="mb-3 block text-[10px] font-bold uppercase tracking-[0.28em]"
+                              style={{ color: text, fontFamily: fonts.body }}
                             >
                               {group.label}
                             </Link>
@@ -439,9 +500,14 @@ export function Header() {
                               {group.areas.map((area, idx) => (
                                 <Link
                                   key={idx}
-                                  href={getServiceAreaPageHref(group.serviceSlug, area, serviceAreaPages)}
+                                  href={getServiceAreaPageHref(
+                                    group.serviceSlug,
+                                    area,
+                                    serviceAreaPages
+                                  )}
                                   onClick={closeMenu}
-                                  className="text-[10px] uppercase tracking-[0.18em] text-slate-500"
+                                  className="text-[10px] uppercase tracking-[0.18em]"
+                                  style={{ color: subtext, fontFamily: fonts.body }}
                                 >
                                   {area.city}
                                 </Link>
@@ -457,18 +523,23 @@ export function Header() {
             )}
           </nav>
 
-          {phoneNumber && (
-            <div className="border-t border-slate-200 pt-6">
-              <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.35em] text-slate-400">
-                Direct Line
-              </span>
-              <a
-                href={`tel:${phoneNumber.replace(/\s/g, '')}`}
-                className="text-lg font-light tracking-tight text-slate-900"
-                style={{ fontFamily: fonts.heading }}
+          {(phoneNumber || contactHref) && (
+            <div
+              className="pt-6"
+              style={{ borderTop: `1px solid color-mix(in srgb, ${text} 12%, transparent)` }}
+            >
+              <Link
+                href={phoneNumber ? `tel:${phoneNumber.replace(/\s/g, '')}` : contactHref!}
+                onClick={closeMenu}
+                className="inline-block px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] transition-opacity hover:opacity-90"
+                style={{
+                  backgroundColor: accent,
+                  color: palette.textOnDark,
+                  fontFamily: fonts.body,
+                }}
               >
-                {phoneNumber}
-              </a>
+                {phoneNumber || 'Contact'}
+              </Link>
             </div>
           )}
         </div>
