@@ -42,7 +42,11 @@ export function WhyChooseUsSection({ whyChooseUsSection, className }: WhyChooseU
   const accentColor = colors.primaryButton;
 
   return (
-    <section id="why-choose-us" className={cn('relative overflow-hidden bg-[#fcfcfc] pt-12 lg:pt-16 pb-8 lg:pb-10', className)}>
+    <section
+      id="why-choose-us"
+      className={cn('relative overflow-hidden pt-12 lg:pt-16 pb-8 lg:pb-10', className)}
+      style={{ backgroundColor: colors.pageBackground }}
+    >
       <div className="container mx-auto px-6 lg:px-12">
         <div
           ref={titleRef}

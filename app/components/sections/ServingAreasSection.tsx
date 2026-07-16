@@ -247,7 +247,8 @@ export function ServingAreasSection({ servingAreasSection, className }: ServingA
   return (
     <section
       id="serving-areas"
-      className={cn('relative overflow-hidden bg-[#fcfcfc] pt-12 lg:pt-16 pb-10 lg:pb-12', className)}
+      className={cn('relative overflow-hidden pt-12 pb-10 lg:pt-16 lg:pb-12', className)}
+      style={{ backgroundColor: colors.pageBackground }}
     >
       <div className="container mx-auto px-6 lg:px-12">
         <div

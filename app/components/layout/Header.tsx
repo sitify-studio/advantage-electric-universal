@@ -8,7 +8,6 @@ import { useWebBuilder } from '@/app/providers/WebBuilderProvider';
 import { useSectionTheme } from '@/app/hooks/useSectionTheme';
 import {
   getBrandName,
-  getBusinessTagline,
   buildHeaderNavEntries,
   getPageHref,
   type HomeHeaderNavEntry,
@@ -168,7 +167,6 @@ export function Header() {
   const [isMounted, setIsMounted] = useState(false);
 
   const businessName = useMemo(() => getBrandName(site), [site]);
-  const tagline = useMemo(() => getBusinessTagline(site) || '', [site]);
   const phoneNumber = site?.business?.phone?.trim() || site?.business?.emergencyPhone?.trim() || '';
   const logoImage = useMemo(() => {
     const url = site?.theme?.logoUrl || site?.footer?.logo?.url;
@@ -323,33 +321,15 @@ export function Header() {
       >
         <div className="mx-auto w-full max-w-[90rem] px-6 md:px-12 lg:px-16 xl:px-20">
           <div className="grid h-[5.75rem] grid-cols-[auto_1fr_auto] items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
-            <Link href="/" className="group flex min-w-0 items-center gap-3">
+            <Link href="/" className="inline-flex min-w-0 shrink-0 items-center">
               <Image
                 src={logoImage}
                 alt={businessName || 'Logo'}
-                width={192}
-                height={192}
-                className="h-20 w-20 shrink-0 object-contain lg:h-24 lg:w-24"
+                width={160}
+                height={160}
+                className="h-14 w-14 object-contain sm:h-16 sm:w-16"
+                priority
               />
-              <div className="min-w-0">
-                <div className="mb-1 flex items-center gap-2.5">
-                  <div className="h-px w-6 shrink-0" style={{ backgroundColor: accent }} />
-                  <span
-                    className="block truncate text-[10px] font-bold uppercase tracking-[0.4em]"
-                    style={{ color: text, fontFamily: fonts.heading }}
-                  >
-                    {businessName || 'Brand'}
-                  </span>
-                </div>
-                {tagline && (
-                  <span
-                    className="hidden truncate pl-[34px] text-[8px] font-medium uppercase tracking-[0.34em] sm:block"
-                    style={{ color: subtext, fontFamily: fonts.body }}
-                  >
-                    {tagline}
-                  </span>
-                )}
-              </div>
             </Link>
 
             <nav className="hidden items-center justify-center gap-8 lg:flex">

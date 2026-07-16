@@ -82,32 +82,25 @@ export default function HomeClient() {
       }}
     >
 
-      <main>
-        <HeroSection hero={displayPage.hero} page={displayPage} />
-        <AboutSection aboutSection={displayPage.aboutSection} page={displayPage} />
-        <ServicesSection
-          servicesSection={displayPage.servicesSection}
-          companyDetailSection={displayPage.companyDetailSection}
-          ctaSection={displayPage.ctaSection}
-          page={displayPage}
-        />
-        <CompanyDetailSection companyDetailSection={displayPage.companyDetailSection} />
-        <CTASection ctaSection={displayPage.ctaSection} />
-        <BlogSection blogSection={displayPage.blogSection} />
-        <ProjectsSection
-          projectSection={displayPage.projectSection}
-          projectsSection={displayPage.projectsSection}
-          projectsLimit={3}
-        />
-        <GallerySection gallerySection={displayPage.gallerySection} />
-        <WhyChooseUsSection whyChooseUsSection={displayPage.whyChooseUsSection} />
-        <FAQSection faqSection={displayPage.faqSection} />
-        <TestimonialsSection testimonialsSection={displayPage.testimonialsSection} />
-        <ServingAreasSection
-          servingAreasSection={displayPage.servingAreasSection ?? { enabled: true }}
-        />
-        <ContactSection contactSection={displayPage.contactSection} />
-      </main>
+      <HeroSection hero={displayPage.hero} page={displayPage} />
+      <AboutSection aboutSection={displayPage.aboutSection} page={displayPage} />
+      <ServicesSection servicesSection={displayPage.servicesSection} />
+      <CompanyDetailSection companyDetailSection={displayPage.companyDetailSection} />
+      <CTASection ctaSection={displayPage.ctaSection} />
+      <BlogSection blogSection={displayPage.blogSection} />
+      <ProjectsSection
+        projectSection={displayPage.projectSection}
+        projectsSection={displayPage.projectsSection}
+        projectsLimit={3}
+      />
+      <GallerySection gallerySection={displayPage.gallerySection} />
+      <WhyChooseUsSection whyChooseUsSection={displayPage.whyChooseUsSection} />
+      <FAQSection faqSection={displayPage.faqSection} />
+      <TestimonialsSection testimonialsSection={displayPage.testimonialsSection} />
+      <ServingAreasSection
+        servingAreasSection={displayPage.servingAreasSection ?? { enabled: true }}
+      />
+      <ContactSection contactSection={displayPage.contactSection} />
       <Footer />
     </div>
   );

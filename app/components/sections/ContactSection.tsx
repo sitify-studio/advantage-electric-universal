@@ -83,7 +83,11 @@ export function ContactSection({ contactSection, className }: ContactSectionProp
     showContactInfo && Boolean(business?.email || business?.phone || addressLine || hasHours);
 
   return (
-    <section id="contact" className={cn('relative overflow-hidden bg-[#fcfcfc] py-20 lg:py-28', className)}>
+    <section
+      id="contact"
+      className={cn('relative overflow-hidden py-20 lg:py-28', className)}
+      style={{ backgroundColor: colors.pageBackground }}
+    >
       <div className="container mx-auto px-6 lg:px-12">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
           <div

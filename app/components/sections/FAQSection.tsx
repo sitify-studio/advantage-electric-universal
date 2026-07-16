@@ -129,7 +129,8 @@ export function FAQSection({ faqSection, className }: FAQSectionProps) {
   return (
     <section
       id="faq"
-      className={cn('relative overflow-hidden bg-[#fcfcfc] pt-12 pb-8 lg:pt-16 lg:pb-10', className)}
+      className={cn('relative overflow-hidden pt-12 pb-8 lg:pt-16 lg:pb-10', className)}
+      style={{ backgroundColor: colors.pageBackground }}
     >
       <div
         className="pointer-events-none absolute -right-16 top-1/4 h-72 w-72 rounded-full blur-3xl opacity-20"

@@ -166,103 +166,98 @@ export function AboutSection({ aboutSection, className }: AboutSectionProps) {
           </div>
         </div>
 
-        <div className={cn('flex w-full flex-col items-center justify-between', hasTitle ? 'pt-4' : 'pt-0')}>
+        <div className={cn('flex w-full flex-col items-center', hasTitle ? 'pt-4' : 'pt-0')}>
+          <div className="mb-5 flex items-center justify-center gap-3">
+            <div className="h-px w-10" style={{ backgroundColor: accent }} />
+            <span
+              className="text-[10px] font-bold uppercase tracking-[0.5em]"
+              style={{ color: accent, fontFamily: fonts.body }}
+            >
+              About
+            </span>
+          </div>
+
           {hasTitle && (
-            <div
+            <h2
               className={cn(
-                'transition-all delay-100 duration-1000',
+                'mx-auto max-w-4xl text-[clamp(2rem,4.2vw,3.5rem)] font-normal leading-[1.05] tracking-tight transition-all delay-100 duration-1000',
                 isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
               )}
+              style={{ color: palette.text, fontFamily: fonts.heading }}
             >
-              <span
-                className="mb-5 block text-[10px] font-bold uppercase tracking-[0.5em]"
-                style={{ color: accent, fontFamily: fonts.body }}
-              >
-                Studio Profile
-              </span>
+              {title}
+            </h2>
+          )}
 
-              <h2
-                className="mx-auto max-w-4xl text-[clamp(2.2rem,4.8vw,4.75rem)] font-normal leading-[0.98] tracking-[-0.03em]"
-                style={{ color: palette.text, fontFamily: fonts.heading }}
-              >
-                {title}
-              </h2>
+          {description && (
+            <p
+              className="mx-auto mt-6 max-w-2xl text-base font-light leading-relaxed sm:text-lg"
+              style={{ color: palette.subtext, fontFamily: fonts.body }}
+            >
+              {description}
+            </p>
+          )}
+
+          {features.length > 0 && (
+            <div
+              ref={featuresRef}
+              className="mt-10 grid w-full gap-4 text-left sm:grid-cols-2"
+            >
+              {features.map((feature, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    'border p-5 transition-all duration-700',
+                    featuresVisible.includes(i)
+                      ? 'translate-y-0 opacity-100'
+                      : 'translate-y-5 opacity-0'
+                  )}
+                  style={{
+                    borderColor: `color-mix(in srgb, ${palette.text} 12%, transparent)`,
+                    backgroundColor: `color-mix(in srgb, ${surface} 96%, white)`,
+                  }}
+                >
+                  <span
+                    className="block text-[10px] font-bold uppercase tracking-[0.35em]"
+                    style={{ color: accent, fontFamily: fonts.body }}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <p
+                    className="mt-3 text-lg font-normal leading-snug tracking-tight"
+                    style={{ color: palette.text, fontFamily: fonts.heading }}
+                  >
+                    {feature.label}
+                  </p>
+                  {feature.description && (
+                    <p
+                      className="mt-2 text-sm font-light leading-relaxed"
+                      style={{ color: palette.subtext, fontFamily: fonts.body }}
+                    >
+                      {feature.description}
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
           )}
 
-          <div className={cn('flex w-full flex-col items-center gap-8', hasTitle ? 'mt-10' : 'mt-0')}>
-            <div className="w-full">
-              {features.length > 0 ? (
-                <div
-                  ref={featuresRef}
-                  className="grid gap-4 text-left sm:grid-cols-2"
-                >
-                  {features.map((feature, i) => (
-                    <div
-                      key={i}
-                      className={cn(
-                        'border p-5 transition-all duration-700',
-                        featuresVisible.includes(i)
-                          ? 'translate-y-0 opacity-100'
-                          : 'translate-y-5 opacity-0'
-                      )}
-                      style={{
-                        borderColor: `color-mix(in srgb, ${palette.text} 12%, transparent)`,
-                        backgroundColor: `color-mix(in srgb, ${surface} 96%, white)`,
-                      }}
-                    >
-                      <span
-                        className="block text-[10px] font-bold uppercase tracking-[0.35em]"
-                        style={{ color: accent, fontFamily: fonts.body }}
-                      >
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <p
-                        className="mt-3 text-lg font-normal leading-snug tracking-tight"
-                        style={{ color: palette.text, fontFamily: fonts.heading }}
-                      >
-                        {feature.label}
-                      </p>
-                      {feature.description && (
-                        <p
-                          className="mt-2 text-sm font-light leading-relaxed"
-                          style={{ color: palette.subtext, fontFamily: fonts.body }}
-                        >
-                          {feature.description}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                description && (
-                  <p
-                    className="mx-auto max-w-2xl text-base font-light leading-relaxed sm:text-lg"
-                    style={{ color: palette.subtext, fontFamily: fonts.body }}
-                  >
-                    {description}
-                  </p>
-                )
-              )}
+          {ctaButton && (
+            <div className="mt-10 flex justify-center">
+              <Link
+                href={ctaButton.href}
+                className="inline-flex items-center justify-between gap-6 border px-5 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] transition-opacity hover:opacity-85"
+                style={{
+                  borderColor: accent,
+                  color: palette.text,
+                  fontFamily: fonts.body,
+                }}
+              >
+                <span>{ctaButton.label}</span>
+                <span style={{ color: accent }}>+</span>
+              </Link>
             </div>
-
-            {ctaButton && (
-              <div className="flex justify-center">
-                <Link
-                  href={ctaButton.href}
-                  className="inline-flex items-center justify-between gap-6 border px-5 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] transition-opacity hover:opacity-85"
-                  style={{
-                    borderColor: accent,
-                    color: palette.text,
-                    fontFamily: fonts.body,
-                  }}
-                >
-                  <span>{ctaButton.label}</span>
-                  <span style={{ color: accent }}>+</span>
-                </Link>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </section>

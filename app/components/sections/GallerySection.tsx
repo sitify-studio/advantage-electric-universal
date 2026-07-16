@@ -185,7 +185,8 @@ export function GallerySection({ gallerySection, className }: GallerySectionProp
   return (
     <section
       id="gallery"
-      className={cn('relative overflow-hidden bg-[#fcfcfc] pt-12 pb-8 lg:pt-16 lg:pb-10', className)}
+      className={cn('relative overflow-hidden pt-12 pb-8 lg:pt-16 lg:pb-10', className)}
+      style={{ backgroundColor: colors.pageBackground }}
     >
       <div
         className="pointer-events-none absolute -left-16 top-1/3 h-72 w-72 rounded-full blur-3xl opacity-20"

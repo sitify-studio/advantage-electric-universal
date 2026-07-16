@@ -14,9 +14,6 @@ import { cn, getImageSrc } from '@/app/lib/utils';
 
 interface ServicesSectionProps {
   servicesSection?: Page['servicesSection'];
-  companyDetailSection?: Page['companyDetailSection'];
-  ctaSection?: Page['ctaSection'];
-  page?: Page;
   className?: string;
 }
 

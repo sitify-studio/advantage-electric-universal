@@ -5,7 +5,6 @@ import { useMemo } from 'react';
 import type { Page } from '@/app/lib/types';
 import { HeroEtherealOrb } from '@/app/components/cinematic/HeroEtherealOrb';
 import { useWebBuilder } from '@/app/providers/WebBuilderProvider';
-import { useScrollAnimation } from '@/app/hooks/useScrollAnimation';
 import { useSectionTheme } from '@/app/hooks/useSectionTheme';
 import { SectionHeading } from '@/app/components/ui/SectionHeading';
 import { tiptapToText } from '@/app/lib/seo';
@@ -43,26 +42,20 @@ export function HeroSection({ hero, className }: HeroSectionProps) {
   const description = useMemo(() => tiptapToText(hero?.description), [hero?.description]);
   const ctaButton = useMemo(() => resolveCtaButton(hero), [hero]);
 
-  const { ref: contentRef, isVisible: contentVisible } = useScrollAnimation<HTMLDivElement>({ threshold: 0.1 });
-
   if (!hero || hero.enabled === false) return null;
   if (!title && !description && !subtitle) return null;
 
   return (
     <section
-      className={cn('relative overflow-hidden flex flex-col min-h-screen w-full', className)}
+      className={cn(
+        'relative flex w-full flex-col overflow-hidden min-h-[calc(100dvh-5.75rem)]',
+        className
+      )}
       style={{
         background: `linear-gradient(180deg, ${palette.bgTop} 0%, ${palette.bgBottom} 100%)`,
       }}
     >
-      <div
-        ref={contentRef}
-        className={cn(
-          'relative z-30 flex flex-col items-center text-center px-6 w-full mx-auto',
-          'transition-all duration-1000',
-          contentVisible ? 'opacity-100 translate-y-0' : 'opacity-100 translate-y-0'
-        )}
-      >
+      <div className="relative z-30 mx-auto flex w-full flex-col items-center px-6 pt-8 text-center md:pt-12">
         <SectionHeading
           eyebrow={subtitle}
           title={title}

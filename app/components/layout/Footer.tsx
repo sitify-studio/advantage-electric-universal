@@ -39,15 +39,15 @@ export function Footer() {
 
   const email = site?.business?.email?.trim() || '';
   const address = site?.business?.address;
-  // Light builder surface so original logo colors stay visible (dark mainText bg hid the logo).
-  const backgroundColor = colors.sectionBackgroundLight || colors.pageBackground;
-  const textColor = colors.mainText;
-  const mutedColor = colors.secondaryText || colors.mainText;
+  const backgroundColor = colors.sectionBackgroundDark || colors.mainText;
+  // Builder light / on-dark text (white)
+  const textColor = colors.darkPrimaryText;
+  const mutedColor = colors.darkSecondaryText || colors.darkPrimaryText;
   const accentColor = colors.primaryButton;
 
   return (
     <footer
-      id="contact"
+      id="site-footer"
       className="relative pt-20 pb-10 overflow-hidden"
       style={{
         backgroundColor,
@@ -67,7 +67,7 @@ export function Footer() {
                 src={logoSrc}
                 alt={businessName || 'Business Name'}
                 fill
-                className="object-contain object-left"
+                className="object-contain object-left brightness-0 invert"
               />
             </div>
             {businessDescription && (

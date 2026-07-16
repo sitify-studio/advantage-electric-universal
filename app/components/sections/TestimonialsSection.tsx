@@ -98,7 +98,8 @@ export function TestimonialsSection({ testimonialsSection, className }: Testimon
     <section
       id="testimonials"
       ref={sectionRef}
-      className={cn('relative pt-12 lg:pt-16 pb-8 lg:pb-10 bg-[#fcfcfc] overflow-hidden', className)}
+      className={cn('relative overflow-hidden pt-12 pb-8 lg:pt-16 lg:pb-10', className)}
+      style={{ backgroundColor: colors.pageBackground }}
     >
       <div
         className="absolute left-[15%] top-0 bottom-0 w-px hidden lg:block"
