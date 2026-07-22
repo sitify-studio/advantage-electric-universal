@@ -91,6 +91,8 @@ const PAGE_TYPE_PATHS: Record<Page['pageType'], string> = {
   'service-list': '/services',
   'blog-list': '/blog',
   'project-detail': '/project-detail',
+  testimonials: '/testimonials',
+  gallery: '/gallery',
 };
 
 /** Slug → path when the app uses a dedicated route folder (not `[pageSlug]`). */
@@ -110,6 +112,12 @@ export function getPageHref(page: Page): string {
 
   const slug = (page.slug || '').replace(/^\/+|\/+$/g, '');
   const normalized = slug.toLowerCase();
+
+  // Testimonials pages always use their CMS slug in the URL
+  if (slug && isTestimonialsPageBySlugOrName(page)) {
+    return `/${slug}`;
+  }
+
   if (normalized && SLUG_PATH_ALIASES[normalized]) {
     return SLUG_PATH_ALIASES[normalized];
   }
@@ -126,23 +134,27 @@ function normalizePageSlug(slug?: string): string {
 
 export const TESTIMONIALS_ROUTE = '/testimonials';
 
-export function isTestimonialsPage(page: Page): boolean {
+function isTestimonialsPageBySlugOrName(page: Page): boolean {
+  if (page.pageType === 'testimonials') return true;
   const slug = normalizePageSlug(page.slug);
   const name = (page.name || '').trim().toLowerCase();
-  if (
+  return (
     slug === 'testimonials' ||
     slug === 'testimonial' ||
     slug.includes('testimonial') ||
     name === 'testimonials' ||
     name === 'testimonial'
-  ) {
-    return true;
-  }
-  return getPageHref(page) === TESTIMONIALS_ROUTE;
+  );
+}
+
+export function isTestimonialsPage(page: Page): boolean {
+  return isTestimonialsPageBySlugOrName(page);
 }
 
 export function isTestimonialsNavItem(item: HeaderNavItem, testimonialsHref = TESTIMONIALS_ROUTE): boolean {
   if (item.href === testimonialsHref) return true;
+  const hrefSlug = item.href.replace(/^\/+|\/+$/g, '').toLowerCase();
+  if (hrefSlug.includes('testimonial')) return true;
   const name = item.name.trim().toLowerCase();
   return name === 'testimonials' || name === 'testimonial';
 }
@@ -151,12 +163,18 @@ export function findTestimonialsPage(pages?: Page[]): Page | undefined {
   return pages?.find((p) => isTestimonialsPage(p));
 }
 
+export function getTestimonialsPageHref(page?: Page | null): string {
+  const slug = normalizePageSlug(page?.slug);
+  if (slug) return `/${slug}`;
+  return TESTIMONIALS_ROUTE;
+}
+
 export function getTestimonialsNavItem(pages?: Page[]): HeaderNavItem {
   const cmsPage = findTestimonialsPage(pages);
   return {
     id: cmsPage?._id ?? 'nav-testimonials',
     name: cmsPage?.name?.trim() || 'Testimonials',
-    href: TESTIMONIALS_ROUTE,
+    href: getTestimonialsPageHref(cmsPage),
   };
 }
 
@@ -370,9 +388,51 @@ export function getFooterNavLinks(pages?: Page[]): FooterNavLink[] {
   return links;
 }
 
-/** Header nav: only published CMS pages (no hardcoded routes). */
+/** Header nav: published CMS pages, ensuring testimonials uses its CMS slug. */
 export function getHeaderNavLinks(pages?: Page[]): FooterNavLink[] {
-  return getPublishedPageNavLinks(pages).filter((link) => link.href !== '/');
+  const links = getPublishedPageNavLinks(pages).filter((link) => link.href !== '/');
+
+  // Fix any existing testimonials entry to use the CMS slug
+  for (let i = 0; i < links.length; i++) {
+    const page = pages?.find((p) => p._id === links[i].id);
+    if (page && isTestimonialsPage(page)) {
+      links[i] = {
+        ...links[i],
+        label: page.name?.trim() || links[i].label,
+        href: getTestimonialsPageHref(page),
+      };
+      return links;
+    }
+  }
+
+  const alreadyHasTestimonials = links.some((l) => {
+    if (l.href === TESTIMONIALS_ROUTE || l.href.replace(/^\/+|\/+$/g, '').toLowerCase().includes('testimonial')) {
+      return true;
+    }
+    return l.label.trim().toLowerCase().includes('testimonial');
+  });
+
+  if (alreadyHasTestimonials) return links;
+
+  const testimonialsPage = findTestimonialsPage(pages);
+  const homePage = pages?.find((p) => p.pageType === 'home');
+  const hasTestimonialsPage = testimonialsPage?.status === 'published';
+  const hasHomeTestimonials =
+    homePage?.status === 'published' &&
+    isHomeSectionEnabled(homePage.testimonialsSection?.enabled);
+
+  if (!hasTestimonialsPage && !hasHomeTestimonials) return links;
+
+  const nav = getTestimonialsNavItem(pages);
+  const item: FooterNavLink = { id: nav.id, label: nav.name, href: nav.href };
+  const contactIdx = links.findIndex((l) => {
+    const page = pages?.find((p) => p._id === l.id);
+    return page?.pageType === 'contact';
+  });
+  if (contactIdx >= 0) links.splice(contactIdx, 0, item);
+  else links.push(item);
+
+  return links;
 }
 
 /** Page-based header entries with optional serving-areas dropdown after Services. */

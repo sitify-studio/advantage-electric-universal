@@ -151,7 +151,7 @@ export interface Page {
   siteId: string;
   name: string;
   slug: string;
-  pageType: 'home' | 'about' | 'contact' | 'service-list' | 'blog-list' | 'project-detail';
+  pageType: 'home' | 'about' | 'contact' | 'service-list' | 'blog-list' | 'project-detail' | 'testimonials' | 'gallery';
   status: 'draft' | 'published' | 'archived';
   serviceListTitle?: any;
   serviceListDescription?: any;

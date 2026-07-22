@@ -68,7 +68,7 @@ function resolveAboutCta(data: Record<string, unknown>): { label: string; href: 
 
 export function AboutSection({ aboutSection, className }: AboutSectionProps) {
   const { site } = useWebBuilder();
-  const { fonts } = useSectionTheme();
+  const { colors, fonts } = useSectionTheme();
   const palette = useMemo(() => buildSectionPalette(site), [site]);
 
   const title = useMemo(() => tiptapToText(aboutSection?.title), [aboutSection?.title]);
@@ -95,17 +95,19 @@ export function AboutSection({ aboutSection, className }: AboutSectionProps) {
     return resolveAboutCta(aboutSection as Record<string, unknown>);
   }, [aboutSection]);
 
-  const { ref: sectionRef, isVisible } = useScrollAnimation<HTMLElement>({ threshold: 0.08 });
+  const { ref: sectionRef, isVisible } = useScrollAnimation<HTMLElement>({ threshold: 0.1 });
   const { ref: featuresRef, visibleItems: featuresVisible } = useStaggeredAnimation(
     features.length,
-    90
+    100
   );
 
   if (!aboutSection || aboutSection.enabled === false) return null;
   if (!title && !description && features.length === 0 && !aboutImage) return null;
 
   const accent = palette.primaryButton;
-  const surface = palette.bgTop;
+  const text = palette.text;
+  const subtext = palette.subtext;
+  const surface = colors.pageBackground;
   const imageAlt = aboutSection.image?.altText?.trim() || title || 'About Us';
   const hasTitle = Boolean(title?.trim());
 
@@ -113,62 +115,69 @@ export function AboutSection({ aboutSection, className }: AboutSectionProps) {
     <section
       id="about"
       ref={sectionRef}
-      data-about-layout="editorial-panel-v3"
+      data-about-layout="split-reveal-v4"
       className={cn('relative overflow-hidden py-16 lg:py-24', className)}
       style={{ backgroundColor: surface }}
     >
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-40"
-        style={{
-          background: `linear-gradient(180deg, color-mix(in srgb, ${accent} 12%, transparent) 0%, transparent 100%)`,
-        }}
+        className="pointer-events-none absolute -left-24 top-1/4 h-72 w-72 rounded-full blur-3xl"
+        style={{ backgroundColor: `color-mix(in srgb, ${accent} 14%, transparent)` }}
       />
 
-      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-10 px-6 text-center md:px-12 lg:gap-14 lg:px-16">
-        <div className="w-full max-w-md">
+      <div className="relative mx-auto grid w-full max-w-[90rem] items-stretch gap-12 px-6 md:px-12 lg:grid-cols-12 lg:gap-16 lg:px-16 xl:px-20">
+        <div
+          className={cn(
+            'relative min-h-[280px] w-full lg:col-span-6 lg:min-h-[320px] transition-all duration-[1100ms] ease-out',
+            isVisible ? 'translate-x-0 opacity-100' : '-translate-x-8 opacity-0'
+          )}
+        >
+          <div className="relative h-full min-h-[280px] overflow-hidden lg:absolute lg:inset-0 lg:min-h-0">
+            {aboutImage ? (
+              <OptimizedImage
+                src={aboutImage}
+                alt={imageAlt}
+                fill
+                sizes={IMAGE_SIZES.sectionWide}
+                className={cn(
+                  'object-cover object-center transition-transform duration-[1600ms] ease-out',
+                  isVisible ? 'scale-100' : 'scale-110'
+                )}
+                priority
+              />
+            ) : (
+              <div
+                className="h-full w-full"
+                style={{
+                  background: `linear-gradient(145deg, ${palette.bgBottom} 0%, ${palette.orbGlow} 100%)`,
+                }}
+              />
+            )}
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, transparent 55%, color-mix(in srgb, ${surface} 55%, transparent) 100%)`,
+              }}
+            />
+          </div>
+
           <div
             className={cn(
-              'relative transition-all duration-1000',
-              isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+              'absolute -bottom-4 -right-4 z-10 hidden h-28 w-28 border transition-all delay-300 duration-1000 sm:block lg:-right-6',
+              isVisible ? 'opacity-100' : 'opacity-0'
             )}
-          >
-            <div
-              className="relative overflow-hidden border p-4 sm:p-5"
-              style={{
-                borderColor: `color-mix(in srgb, ${palette.text} 12%, transparent)`,
-                backgroundColor: `color-mix(in srgb, ${surface} 92%, white)`,
-              }}
-            >
-              <div className="relative aspect-[4/5] overflow-hidden">
-                {aboutImage ? (
-                  <OptimizedImage
-                    src={aboutImage}
-                    alt={imageAlt}
-                    fill
-                    sizes={IMAGE_SIZES.sectionWide}
-                    className={cn(
-                      'object-cover object-center transition-transform duration-[1600ms] ease-out',
-                      isVisible ? 'scale-100' : 'scale-110'
-                    )}
-                    priority
-                  />
-                ) : (
-                  <div
-                    className="h-full w-full"
-                    style={{
-                      background: `linear-gradient(145deg, ${palette.bgBottom} 0%, ${palette.orbGlow} 100%)`,
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-
-          </div>
+            style={{ borderColor: `color-mix(in srgb, ${accent} 55%, transparent)` }}
+            aria-hidden
+          />
         </div>
 
-        <div className={cn('flex w-full flex-col items-center', hasTitle ? 'pt-4' : 'pt-0')}>
-          <div className="mb-5 flex items-center justify-center gap-3">
-            <div className="h-px w-10" style={{ backgroundColor: accent }} />
+        <div
+          className={cn(
+            'flex h-full flex-col justify-center lg:col-span-6 transition-all delay-150 duration-[1100ms] ease-out',
+            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+          )}
+        >
+          <div className="mb-6 flex items-center gap-3">
+            <div className="h-px w-10 shrink-0" style={{ backgroundColor: accent }} />
             <span
               className="text-[10px] font-bold uppercase tracking-[0.5em]"
               style={{ color: accent, fontFamily: fonts.body }}
@@ -179,11 +188,8 @@ export function AboutSection({ aboutSection, className }: AboutSectionProps) {
 
           {hasTitle && (
             <h2
-              className={cn(
-                'mx-auto max-w-4xl text-[clamp(2rem,4.2vw,3.5rem)] font-normal leading-[1.05] tracking-tight transition-all delay-100 duration-1000',
-                isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-              )}
-              style={{ color: palette.text, fontFamily: fonts.heading }}
+              className="max-w-xl text-[clamp(2rem,4vw,3.35rem)] font-normal leading-[1.05] tracking-tight"
+              style={{ color: text, fontFamily: fonts.heading }}
             >
               {title}
             </h2>
@@ -191,70 +197,74 @@ export function AboutSection({ aboutSection, className }: AboutSectionProps) {
 
           {description && (
             <p
-              className="mx-auto mt-6 max-w-2xl text-base font-light leading-relaxed sm:text-lg"
-              style={{ color: palette.subtext, fontFamily: fonts.body }}
+              className="mt-6 max-w-lg text-base font-light leading-relaxed sm:text-lg"
+              style={{ color: subtext, fontFamily: fonts.body }}
             >
               {description}
             </p>
           )}
 
           {features.length > 0 && (
-            <div
-              ref={featuresRef}
-              className="mt-10 grid w-full gap-4 text-left sm:grid-cols-2"
-            >
+            <div ref={featuresRef} className="mt-10 space-y-0 border-t" style={{ borderColor: `color-mix(in srgb, ${text} 12%, transparent)` }}>
               {features.map((feature, i) => (
                 <div
                   key={i}
                   className={cn(
-                    'border p-5 transition-all duration-700',
+                    'grid grid-cols-[auto_1fr] gap-5 border-b py-5 transition-all duration-700',
                     featuresVisible.includes(i)
                       ? 'translate-y-0 opacity-100'
-                      : 'translate-y-5 opacity-0'
+                      : 'translate-y-4 opacity-0'
                   )}
-                  style={{
-                    borderColor: `color-mix(in srgb, ${palette.text} 12%, transparent)`,
-                    backgroundColor: `color-mix(in srgb, ${surface} 96%, white)`,
-                  }}
+                  style={{ borderColor: `color-mix(in srgb, ${text} 12%, transparent)` }}
                 >
                   <span
-                    className="block text-[10px] font-bold uppercase tracking-[0.35em]"
+                    className="pt-1 text-[10px] font-bold uppercase tracking-[0.35em]"
                     style={{ color: accent, fontFamily: fonts.body }}
                   >
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  <p
-                    className="mt-3 text-lg font-normal leading-snug tracking-tight"
-                    style={{ color: palette.text, fontFamily: fonts.heading }}
-                  >
-                    {feature.label}
-                  </p>
-                  {feature.description && (
+                  <div>
                     <p
-                      className="mt-2 text-sm font-light leading-relaxed"
-                      style={{ color: palette.subtext, fontFamily: fonts.body }}
+                      className="text-lg font-normal leading-snug tracking-tight sm:text-xl"
+                      style={{ color: text, fontFamily: fonts.heading }}
                     >
-                      {feature.description}
+                      {feature.label}
                     </p>
-                  )}
+                    {feature.description && (
+                      <p
+                        className="mt-2 text-sm font-light leading-relaxed"
+                        style={{ color: subtext, fontFamily: fonts.body }}
+                      >
+                        {feature.description}
+                      </p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
           )}
 
           {ctaButton && (
-            <div className="mt-10 flex justify-center">
+            <div className="mt-10">
               <Link
                 href={ctaButton.href}
-                className="inline-flex items-center justify-between gap-6 border px-5 py-4 text-[11px] font-semibold uppercase tracking-[0.22em] transition-opacity hover:opacity-85"
-                style={{
-                  borderColor: accent,
-                  color: palette.text,
-                  fontFamily: fonts.body,
-                }}
+                className="group inline-flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.22em] transition-opacity hover:opacity-80"
+                style={{ color: text, fontFamily: fonts.body }}
               >
-                <span>{ctaButton.label}</span>
-                <span style={{ color: accent }}>+</span>
+                <span className="relative pb-1">
+                  {ctaButton.label}
+                  <span
+                    className="absolute inset-x-0 bottom-0 h-px origin-left transition-transform duration-500 group-hover:scale-x-0"
+                    style={{ backgroundColor: accent }}
+                  />
+                </span>
+                <span
+                  className="inline-flex h-9 w-9 items-center justify-center border text-sm transition-transform duration-500 group-hover:translate-x-1"
+                  style={{ borderColor: accent, color: accent }}
+                  aria-hidden
+                >
+                  →
+                </span>
               </Link>
             </div>
           )}

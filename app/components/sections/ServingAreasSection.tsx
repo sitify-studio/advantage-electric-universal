@@ -85,39 +85,56 @@ function AreaItem({
   area,
   index,
   accentColor,
+  textColor,
+  surface,
   fonts,
   visible,
+  compact,
 }: {
   area: DisplayArea;
   index: number;
   accentColor: string;
+  textColor: string;
+  surface: string;
   fonts: ReturnType<typeof useSectionTheme>['fonts'];
   visible: boolean;
+  compact?: boolean;
 }) {
   const content = (
     <div
       className={cn(
-        'border-t border-slate-200 pt-6 transition-all duration-700',
+        'transition-all duration-700',
+        compact
+          ? 'inline-flex items-center gap-4 px-6 py-5 sm:px-8 sm:py-6'
+          : 'border-t px-5 py-6 sm:px-6',
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6',
         area.href && 'group'
       )}
+      style={{
+        backgroundColor: surface,
+        borderColor: compact
+          ? undefined
+          : `color-mix(in srgb, ${textColor} 14%, transparent)`,
+      }}
     >
-      <div className="flex items-baseline gap-4 mb-4">
-        <span
-          className="text-[10px] font-bold uppercase tracking-[0.35em]"
-          style={{ color: accentColor }}
-        >
-          {String(index + 1).padStart(2, '0')}
-        </span>
-        <div className="h-px flex-1 max-w-12" style={{ backgroundColor: `${accentColor}40` }} />
-      </div>
+      <span
+        className="shrink-0 text-[10px] font-bold uppercase tracking-[0.35em]"
+        style={{ color: accentColor }}
+      >
+        {String(index + 1).padStart(2, '0')}
+      </span>
+
+      {!compact && (
+        <div className="mb-4 mt-3 h-px max-w-12" style={{ backgroundColor: `${accentColor}40` }} />
+      )}
 
       <p
         className={cn(
-          'text-base sm:text-lg font-normal tracking-tight text-slate-900',
-          area.href && 'transition-colors group-hover:text-slate-600'
+          'font-normal tracking-tight',
+          compact ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg',
+          area.href && 'transition-opacity group-hover:opacity-70'
         )}
-        style={{ fontFamily: fonts.heading }}
+        style={{ color: textColor, fontFamily: fonts.heading }}
       >
         {area.label}
       </p>
@@ -128,7 +145,10 @@ function AreaItem({
     return (
       <Link
         href={area.href}
-        className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded-sm"
+        className={cn(
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+          compact ? 'inline-flex' : 'block'
+        )}
       >
         {content}
       </Link>
@@ -243,44 +263,101 @@ export function ServingAreasSection({ servingAreasSection, className }: ServingA
   if (serviceAreas.length === 0) return null;
 
   const accentColor = colors.primaryButton;
+  const textColor = colors.mainText;
+  const areaSurface = `color-mix(in srgb, ${colors.sectionBackgroundLight || accentColor} 28%, ${colors.pageBackground})`;
+  const isSparse = serviceAreas.length <= 2;
+  const gridClass =
+    serviceAreas.length === 1
+      ? 'grid-cols-1'
+      : serviceAreas.length === 2
+        ? 'grid-cols-1 sm:grid-cols-2'
+        : serviceAreas.length === 3
+          ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+          : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
 
   return (
     <section
       id="serving-areas"
-      className={cn('relative overflow-hidden pt-12 pb-10 lg:pt-16 lg:pb-12', className)}
+      className={cn(
+        'relative overflow-hidden',
+        isSparse ? 'py-10 lg:py-12' : 'pt-12 pb-10 lg:pt-16 lg:pb-12',
+        className
+      )}
       style={{ backgroundColor: colors.pageBackground }}
     >
       <div className="container mx-auto px-6 lg:px-12">
-        <div
-          ref={titleRef}
-          className={cn(
-            'mb-8 lg:mb-10 max-w-3xl transition-all duration-1000',
-            titleVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          )}
-        >
-          <SectionHeading
-            eyebrow="Locations"
-            title={sectionTitle}
-            description={sectionDescription || undefined}
-            descriptionClassName="max-w-2xl"
-          />
-        </div>
+        {isSparse ? (
+          <div
+            ref={titleRef}
+            className={cn(
+              'flex flex-col gap-8 transition-all duration-1000 lg:flex-row lg:items-end lg:justify-between lg:gap-16',
+              titleVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            )}
+          >
+            <div className="max-w-xl shrink-0">
+              <SectionHeading
+                eyebrow="Locations"
+                title={sectionTitle}
+                description={sectionDescription || undefined}
+                descriptionClassName="max-w-md"
+              />
+            </div>
 
-        <div
-          ref={gridRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-8"
-        >
-          {serviceAreas.map((area, index) => (
-            <AreaItem
-              key={areaKey(area)}
-              area={area}
-              index={index}
-              accentColor={accentColor}
-              fonts={fonts}
-              visible={visibleItems.includes(index)}
-            />
-          ))}
-        </div>
+            <div
+              ref={gridRef}
+              className={cn(
+                'flex flex-wrap items-stretch gap-4',
+                serviceAreas.length === 1 ? 'lg:justify-end' : ''
+              )}
+            >
+              {serviceAreas.map((area, index) => (
+                <AreaItem
+                  key={areaKey(area)}
+                  area={area}
+                  index={index}
+                  accentColor={accentColor}
+                  textColor={textColor}
+                  surface={areaSurface}
+                  fonts={fonts}
+                  visible={visibleItems.includes(index)}
+                  compact
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <>
+            <div
+              ref={titleRef}
+              className={cn(
+                'mb-8 lg:mb-10 max-w-3xl transition-all duration-1000',
+                titleVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              )}
+            >
+              <SectionHeading
+                eyebrow="Locations"
+                title={sectionTitle}
+                description={sectionDescription || undefined}
+                descriptionClassName="max-w-2xl"
+              />
+            </div>
+
+            <div ref={gridRef} className={cn('grid gap-4 sm:gap-5', gridClass)}>
+              {serviceAreas.map((area, index) => (
+                <AreaItem
+                  key={areaKey(area)}
+                  area={area}
+                  index={index}
+                  accentColor={accentColor}
+                  textColor={textColor}
+                  surface={areaSurface}
+                  fonts={fonts}
+                  visible={visibleItems.includes(index)}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

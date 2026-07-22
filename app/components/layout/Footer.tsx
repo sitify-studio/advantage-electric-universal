@@ -15,7 +15,7 @@ import { tiptapToText } from '@/app/lib/seo';
 import { getImageSrc } from '@/app/lib/utils';
 
 export function Footer() {
-  const { site, pages } = useWebBuilder();
+  const { site, pages, services } = useWebBuilder();
   const theme = useSectionTheme();
   const { colors } = theme;
 
@@ -26,6 +26,17 @@ export function Footer() {
   );
   const copyright = useMemo(() => getCopyrightText(site), [site]);
   const navLinks = useMemo(() => getFooterNavLinks(pages), [pages]);
+  const serviceLinks = useMemo(
+    () =>
+      (services ?? [])
+        .filter((s) => s.status === 'published' && s.name?.trim())
+        .map((s) => ({
+          id: s._id,
+          label: s.name.trim(),
+          href: `/service/${s.slug || s.name.toLowerCase().replace(/\s+/g, '-')}`,
+        })),
+    [services]
+  );
 
   const logoSrc = useMemo(() => {
     const url = site?.footer?.logo?.url || site?.theme?.logoUrl;
@@ -61,7 +72,7 @@ export function Footer() {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-8 sm:gap-12 mb-16 sm:mb-20">
-          <div className="md:col-span-5">
+          <div className="md:col-span-4">
             <div className="relative mb-8 h-24 w-72">
               <Image
                 src={logoSrc}
@@ -95,7 +106,7 @@ export function Footer() {
             )}
           </div>
 
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <h4 className="text-[10px] font-bold uppercase tracking-[0.5em]" style={{ color: accentColor }}>
               Navigation
             </h4>
@@ -113,7 +124,27 @@ export function Footer() {
             </nav>
           </div>
 
-          <div className="md:col-span-4">
+          {serviceLinks.length > 0 && (
+            <div className="md:col-span-3">
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.5em]" style={{ color: accentColor }}>
+                Services
+              </h4>
+              <nav className="flex flex-col gap-4 mt-6">
+                {serviceLinks.map((link) => (
+                  <Link
+                    key={link.id}
+                    href={link.href}
+                    className="text-sm font-light hover:translate-x-2 transition-transform duration-500"
+                    style={{ color: textColor }}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          )}
+
+          <div className={serviceLinks.length > 0 ? 'md:col-span-3' : 'md:col-span-6'}>
             <h4 className="text-[10px] font-bold uppercase tracking-[0.5em]" style={{ color: accentColor }}>
               Contact
             </h4>

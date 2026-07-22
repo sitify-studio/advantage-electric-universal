@@ -1,15 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useMemo } from 'react';
 import type { Page } from '@/app/lib/types';
 import { useWebBuilder } from '@/app/providers/WebBuilderProvider';
 import { useScrollAnimation, useStaggeredAnimation } from '@/app/hooks/useScrollAnimation';
 import { useSectionTheme } from '@/app/hooks/useSectionTheme';
-import { SectionHeading } from '@/app/components/ui/SectionHeading';
 import { buildSectionPalette } from '@/app/lib/sectionPalette';
-import { getPageHref } from '@/app/lib/siteContent';
 import { tiptapToText } from '@/app/lib/seo';
 import { cn, getImageSrc } from '@/app/lib/utils';
 
@@ -18,9 +15,46 @@ interface CompanyDetailSectionProps {
   className?: string;
 }
 
+const FEATURE_ICONS = [
+  // Medal
+  (color: string) => (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4" aria-hidden>
+      <circle cx="12" cy="9" r="5.5" />
+      <path d="M9.2 13.8 8 21l4-2.2L16 21l-1.2-7.2" />
+      <path d="M10 7.5h4" />
+    </svg>
+  ),
+  // Personalized
+  (color: string) => (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4" aria-hidden>
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M5.5 19c1.4-3.2 3.7-4.8 6.5-4.8s5.1 1.6 6.5 4.8" />
+      <circle cx="17.5" cy="9.5" r="3.2" />
+      <path d="M17.5 12.7v2.2M16.4 13.8h2.2" />
+    </svg>
+  ),
+  // Forward thinking / podium
+  (color: string) => (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4" aria-hidden>
+      <path d="M5 19h14" />
+      <path d="M7 19v-5h3v5" />
+      <path d="M10.5 19V8h3v11" />
+      <path d="M14 19v-3h3v3" />
+      <path d="M12 4.5l.8 1.6 1.8.3-1.3 1.2.3 1.8L12 8.5l-1.6.9.3-1.8-1.3-1.2 1.8-.3L12 4.5z" />
+    </svg>
+  ),
+  // Chart / results
+  (color: string) => (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.4" aria-hidden>
+      <rect x="4" y="4" width="16" height="16" rx="1.5" />
+      <path d="M7.5 15.5 11 11l2.5 2.5 3-4" />
+    </svg>
+  ),
+];
+
 export function CompanyDetailSection({ companyDetailSection, className }: CompanyDetailSectionProps) {
-  const { site, pages } = useWebBuilder();
-  const { fonts } = useSectionTheme();
+  const { site } = useWebBuilder();
+  const { colors, fonts } = useSectionTheme();
   const palette = useMemo(() => buildSectionPalette(site), [site]);
 
   const heading = useMemo(
@@ -31,167 +65,192 @@ export function CompanyDetailSection({ companyDetailSection, className }: Compan
     () => tiptapToText(companyDetailSection?.description),
     [companyDetailSection?.description]
   );
-  const sections = useMemo(
+  const details = useMemo(
     () =>
       companyDetailSection?.details
         ?.map((detail) => ({
           heading: tiptapToText(detail.title) || detail.label?.trim() || '',
           description: tiptapToText(detail.description) || tiptapToText(detail.value),
           imageUrl: detail.image?.url ? getImageSrc(detail.image.url) : '',
-          imageAlt: detail.image?.altText?.trim(),
+          imageAlt: detail.image?.altText?.trim() || '',
         }))
-        .filter((detail) => detail.heading || detail.description) ?? [],
+        .filter((detail) => detail.heading || detail.description || detail.imageUrl) ?? [],
     [companyDetailSection?.details]
   );
 
-  const detailHref = useMemo(() => {
-    const aboutPage = pages.find((p) => p.status === 'published' && p.pageType === 'about');
-    if (aboutPage) return getPageHref(aboutPage);
-    const contactPage = pages.find((p) => p.status === 'published' && p.pageType === 'contact');
-    if (contactPage) return getPageHref(contactPage);
-    return null;
-  }, [pages]);
+  const collageImages = useMemo(() => {
+    const withImages = details.filter((d) => d.imageUrl).slice(0, 3);
+    if (withImages.length >= 3) return withImages;
+    // Prefer detail images; pad with empties so collage layout still holds
+    const padded = [...withImages];
+    while (padded.length < 3) {
+      padded.push({ heading: '', description: '', imageUrl: '', imageAlt: '' });
+    }
+    return padded.slice(0, 3);
+  }, [details]);
 
-  const { ref: titleRef, isVisible: titleVisible } = useScrollAnimation<HTMLDivElement>({
-    threshold: 0.1,
-  });
-  const { ref: sectionsRef, visibleItems: sectionsVisible } = useStaggeredAnimation(
-    sections.length,
-    150
-  );
+  const features = useMemo(() => details.filter((d) => d.heading || d.description).slice(0, 4), [details]);
+
+  const { ref: sectionRef, isVisible } = useScrollAnimation<HTMLElement>({ threshold: 0.1 });
+  const { ref: featuresRef, visibleItems: featuresVisible } = useStaggeredAnimation(features.length, 100);
 
   if (!companyDetailSection || companyDetailSection.enabled === false) return null;
-  if (!heading && !description && sections.length === 0) return null;
+  if (!heading && !description && details.length === 0) return null;
 
-  const accent = palette.primaryButton;
+  const bg = colors.pageBackground;
   const text = palette.text;
   const subtext = palette.subtext;
-  const surface = palette.bgTop;
+  const accent = colors.primaryButton;
+
+  const collageSlots = [
+    { className: 'left-[38%] top-0 z-[1] w-[52%] aspect-[4/5]' },
+    { className: 'left-0 top-[28%] z-[2] w-[50%] aspect-[4/5]' },
+    { className: 'left-[42%] top-[52%] z-[3] w-[52%] aspect-[4/5]' },
+  ];
 
   return (
     <section
       id="company-details"
+      ref={sectionRef}
       className={cn('relative overflow-hidden py-16 lg:py-24', className)}
-      style={{ backgroundColor: surface }}
+      style={{ backgroundColor: bg }}
     >
+      {/* Soft rounded-square pattern */}
       <div
-        className="pointer-events-none absolute left-1/2 top-0 z-0 hidden h-full w-px -translate-x-1/2 lg:block"
-        style={{ backgroundColor: `color-mix(in srgb, ${accent} 18%, transparent)` }}
+        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, ${text} 0.5px, transparent 0.6px)`,
+          backgroundSize: '28px 28px',
+          maskImage:
+            'radial-gradient(ellipse 70% 80% at 20% 50%, black 10%, transparent 70%)',
+          WebkitMaskImage:
+            'radial-gradient(ellipse 70% 80% at 20% 50%, black 10%, transparent 70%)',
+        }}
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-y-0 left-0 w-[55%] opacity-[0.045]"
+        style={{
+          backgroundImage: `repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 72px,
+            color-mix(in srgb, ${text} 35%, transparent) 72px,
+            color-mix(in srgb, ${text} 35%, transparent) 74px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 72px,
+            color-mix(in srgb, ${text} 35%, transparent) 72px,
+            color-mix(in srgb, ${text} 35%, transparent) 74px
+          )`,
+          maskImage: 'linear-gradient(90deg, black 0%, transparent 85%)',
+          WebkitMaskImage: 'linear-gradient(90deg, black 0%, transparent 85%)',
+        }}
+        aria-hidden
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-[90rem] px-6 md:px-12 lg:px-16 xl:px-20">
+      <div className="relative z-10 mx-auto grid w-full max-w-[90rem] items-stretch gap-12 px-6 md:px-12 lg:grid-cols-2 lg:gap-16 lg:px-16 xl:gap-20 xl:px-20">
+        {/* Collage — stretches to match content height */}
         <div
-          ref={titleRef}
           className={cn(
-            'mb-10 max-w-4xl transition-all duration-1000 lg:mb-14',
-            titleVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
+            'relative min-h-[340px] w-full transition-all duration-[1100ms] ease-out lg:min-h-[420px]',
+            isVisible ? 'translate-x-0 opacity-100' : '-translate-x-8 opacity-0'
           )}
         >
-          <SectionHeading
-            eyebrow="Company Detail"
-            title={heading}
-            description={description}
-            descriptionClassName="max-w-2xl"
-          />
+          <div className="relative h-full min-h-[340px] w-full lg:absolute lg:inset-0 lg:min-h-0">
+            {collageImages.map((img, i) => (
+              <div
+                key={i}
+                className={cn('absolute overflow-hidden rounded-[1.75rem] shadow-lg', collageSlots[i].className)}
+                style={{
+                  backgroundColor: `color-mix(in srgb, ${accent} 12%, ${bg})`,
+                  boxShadow: `0 18px 40px color-mix(in srgb, ${text} 12%, transparent)`,
+                }}
+              >
+                {img.imageUrl ? (
+                  <Image
+                    src={img.imageUrl}
+                    alt={img.imageAlt || img.heading || `Team ${i + 1}`}
+                    fill
+                    sizes="(max-width: 1024px) 45vw, 22vw"
+                    className="object-cover"
+                  />
+                ) : null}
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div ref={sectionsRef} className="space-y-16 lg:space-y-24">
-          {sections.map((section, index) => {
-            const isEven = index % 2 === 0;
+        {/* Content */}
+        <div
+          className={cn(
+            'flex h-full flex-col justify-center transition-all delay-150 duration-[1100ms] ease-out',
+            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+          )}
+        >
+          {heading && (
+            <h2
+              className="max-w-xl text-[clamp(2.25rem,4.5vw,3.75rem)] font-normal leading-[1.08] tracking-tight"
+              style={{ color: text, fontFamily: fonts.heading }}
+            >
+              {heading}
+            </h2>
+          )}
 
-            return (
-              <div
-                key={index}
-                className={cn(
-                  'grid grid-cols-1 gap-8 sm:gap-10 lg:grid-cols-2 lg:items-stretch lg:gap-16 transition-all duration-1000',
-                  sectionsVisible.includes(index)
-                    ? 'translate-y-0 opacity-100'
-                    : 'translate-y-20 opacity-0'
-                )}
-              >
-                <div
-                  className={cn(
-                    'relative min-h-[260px] w-full lg:min-h-[320px]',
-                    isEven ? 'lg:order-1' : 'lg:order-2'
-                  )}
-                >
+          {description && (
+            <p
+              className="mt-5 max-w-xl text-base font-light leading-relaxed sm:text-lg"
+              style={{ color: subtext, fontFamily: fonts.body }}
+            >
+              {description}
+            </p>
+          )}
+
+          {features.length > 0 && (
+            <div
+              ref={featuresRef}
+              className="mt-10 grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2 sm:gap-y-12"
+            >
+              {features.map((feature, i) => {
+                const Icon = FEATURE_ICONS[i % FEATURE_ICONS.length];
+                return (
                   <div
-                    className="relative h-full min-h-[260px] overflow-hidden lg:absolute lg:inset-0 lg:min-h-0"
-                    style={{
-                      backgroundColor: `color-mix(in srgb, ${accent} 14%, ${surface})`,
-                    }}
-                  >
-                    {section.imageUrl && (
-                      <Image
-                        src={section.imageUrl}
-                        alt={section.imageAlt || section.heading}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                        className="object-cover transition-transform duration-[2000ms] ease-out hover:scale-105"
-                      />
-                    )}
-                  </div>
-                  <div
+                    key={i}
                     className={cn(
-                      'absolute -bottom-6 hidden text-7xl font-bold tracking-tighter opacity-5 lg:block',
-                      isEven ? '-right-6' : '-left-6'
+                      'transition-all duration-700',
+                      featuresVisible.includes(i)
+                        ? 'translate-y-0 opacity-100'
+                        : 'translate-y-5 opacity-0'
                     )}
-                    style={{ color: text, fontFamily: fonts.heading }}
                   >
-                    0{index + 1}
-                  </div>
-                </div>
-
-                <div
-                  className={cn(
-                    'flex w-full flex-col justify-center text-left',
-                    isEven ? 'lg:order-2' : 'lg:order-1'
-                  )}
-                >
-                  <div className="max-w-md">
-                    <div className="mb-6 flex items-center gap-4">
-                      <div className="h-px w-8" style={{ background: accent }} />
-                      <span
-                        className="text-[10px] font-bold uppercase tracking-[0.3em]"
-                        style={{ color: accent, fontFamily: fonts.body }}
-                      >
-                        Detail 0{index + 1}
-                      </span>
-                    </div>
-
-                    {section.heading && (
+                    <div className="mb-3">{Icon(text)}</div>
+                    <div
+                      className="mb-4 h-px w-8"
+                      style={{ backgroundColor: `color-mix(in srgb, ${text} 45%, transparent)` }}
+                    />
+                    {feature.heading && (
                       <h3
-                        className="mb-4 text-xl font-normal leading-snug tracking-tight sm:mb-6 sm:text-2xl md:text-3xl"
-                        style={{ color: text, fontFamily: fonts.heading }}
+                        className="mb-2 text-base font-semibold tracking-tight sm:text-lg"
+                        style={{ color: text, fontFamily: fonts.body }}
                       >
-                        {section.heading}
+                        {feature.heading}
                       </h3>
                     )}
-
-                    {section.description && (
+                    {feature.description && (
                       <p
-                        className="text-sm font-light leading-relaxed sm:text-base"
+                        className="text-sm font-light leading-relaxed"
                         style={{ color: subtext, fontFamily: fonts.body }}
                       >
-                        {section.description}
+                        {feature.description}
                       </p>
                     )}
-
-                    {detailHref && (
-                      <Link
-                        href={detailHref}
-                        className="group mt-8 inline-flex items-center gap-4 text-[11px] font-bold uppercase tracking-[0.3em] transition-opacity hover:opacity-75"
-                        style={{ color: accent, fontFamily: fonts.body }}
-                      >
-                        <span>Discover More</span>
-                        <span className="h-px w-12 transition-all duration-500 group-hover:w-16" style={{ backgroundColor: accent }} />
-                      </Link>
-                    )}
                   </div>
-                </div>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </section>

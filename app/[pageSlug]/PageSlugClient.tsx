@@ -23,6 +23,7 @@ import { BlogSection } from '@/app/components/sections/BlogSection';
 import { ServingAreasSection } from '@/app/components/sections/ServingAreasSection';
 import api from '@/app/lib/fetch-api';
 import { Page, ServiceAreaPage } from '@/app/lib/types';
+import { isTestimonialsPage } from '@/app/lib/siteContent';
 
 interface PageSlugClientProps {
   pageSlug: string;
@@ -155,7 +156,7 @@ export default function PageSlugClient({ pageSlug: pageSlugProp }: PageSlugClien
           <HeroSection hero={page?.hero} />
         )}
 
-        {page?.slug === 'testimonials' && (
+        {(page?.slug === 'testimonials' || (page && isTestimonialsPage(page))) && (
           <>
             <HeroSection hero={page?.hero} />
             <TestimonialsSection testimonialsSection={page?.testimonialsSection} />
