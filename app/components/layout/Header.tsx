@@ -320,14 +320,14 @@ export function Header() {
         }}
       >
         <div className="mx-auto w-full max-w-[90rem] px-6 md:px-12 lg:px-16 xl:px-20">
-          <div className="grid h-[5.75rem] grid-cols-[auto_1fr_auto] items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
+          <div className="grid h-[6.5rem] grid-cols-[auto_1fr_auto] items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
             <Link href="/" className="inline-flex min-w-0 shrink-0 items-center">
               <Image
                 src={logoImage}
                 alt={businessName || 'Logo'}
                 width={160}
                 height={160}
-                className="h-[4.25rem] w-auto max-w-[12rem] object-contain sm:h-[4.75rem] sm:max-w-[14rem]"
+                className="h-[5.25rem] w-auto max-w-[16rem] object-contain sm:h-[5.75rem] sm:max-w-[18rem]"
                 priority
               />
             </Link>

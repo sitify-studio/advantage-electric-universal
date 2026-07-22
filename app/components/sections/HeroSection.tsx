@@ -48,7 +48,7 @@ export function HeroSection({ hero, className }: HeroSectionProps) {
   return (
     <section
       className={cn(
-        'relative flex w-full flex-col overflow-hidden min-h-[calc(100dvh-5.75rem)]',
+        'relative flex w-full flex-col overflow-hidden min-h-[calc(100dvh-6.5rem)]',
         className
       )}
       style={{

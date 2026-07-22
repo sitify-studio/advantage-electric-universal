@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Page, Site, Service, BlogPost, ServiceAreaPage } from './types'
+import { getImageSrc } from './utils'
 
 interface SEOData {
   title?: string
@@ -7,6 +8,13 @@ interface SEOData {
   keywords?: string[]
   ogImageUrl?: string
   noIndex?: boolean
+}
+
+export function getSiteFaviconUrl(site?: Site | null): string | undefined {
+  const raw = site?.seo?.faviconUrl?.trim()
+  if (!raw) return undefined
+  const src = getImageSrc(raw)
+  return src || undefined
 }
 
 export function generateMetadata(seoData: SEOData, site?: Site): Metadata {
@@ -20,6 +28,15 @@ export function generateMetadata(seoData: SEOData, site?: Site): Metadata {
     title: finalTitle,
     description: description || site?.business?.description || 'Generated site using Web Builder',
     keywords: keywords?.join(', ') || site?.seo?.keywords?.join(', '),
+  }
+
+  const faviconUrl = getSiteFaviconUrl(site)
+  if (faviconUrl) {
+    metadata.icons = {
+      icon: [{ url: faviconUrl }],
+      shortcut: [{ url: faviconUrl }],
+      apple: [{ url: faviconUrl }],
+    }
   }
 
   // Add Open Graph metadata
