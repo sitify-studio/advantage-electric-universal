@@ -1,45 +1,93 @@
-import type { Metadata } from 'next'
-import { Page, Site, Service, BlogPost, ServiceAreaPage } from './types'
-import { getImageSrc } from './utils'
+import type { Metadata } from 'next';
+import { Page, Site, Service, BlogPost, ServiceAreaPage } from './types';
+import { getImageSrc } from './utils';
 
 interface SEOData {
-  title?: string
-  description?: string
-  keywords?: string[]
-  ogImageUrl?: string
-  noIndex?: boolean
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  ogImageUrl?: string;
+  noIndex?: boolean;
 }
 
+function resolveApiOrigin(): string {
+  const raw = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '') || '';
+  if (!raw) return '';
+  try {
+    const withApi = /\/api$/i.test(raw) ? raw : `${raw}/api`;
+    return new URL(withApi).origin;
+  } catch {
+    return '';
+  }
+}
+
+/** Absolute builder favicon URL (never site-relative `/api/uploads/...`). */
 export function getSiteFaviconUrl(site?: Site | null): string | undefined {
-  const raw = site?.seo?.faviconUrl?.trim()
-  if (!raw) return undefined
-  const src = getImageSrc(raw)
-  return src || undefined
+  const rawValue = site?.seo?.faviconUrl as string | { url?: string } | undefined;
+  const raw =
+    typeof rawValue === 'string'
+      ? rawValue.trim()
+      : typeof rawValue?.url === 'string'
+        ? rawValue.url.trim()
+        : '';
+  if (!raw) return undefined;
+
+  const src = getImageSrc(raw);
+  if (!src) return undefined;
+
+  if (/^https?:\/\//i.test(src)) {
+    return src.replace(/^http:\/\//i, 'https://');
+  }
+
+  const origin = resolveApiOrigin();
+  if (!origin) return undefined;
+
+  if (src.startsWith('/')) return `${origin}${src}`;
+  return `${origin}/${src}`;
+}
+
+export function getFaviconMimeType(url?: string): string | undefined {
+  if (!url) return undefined;
+  const lower = url.toLowerCase();
+  if (lower.includes('.png')) return 'image/png';
+  if (lower.includes('.jpg') || lower.includes('.jpeg')) return 'image/jpeg';
+  if (lower.includes('.svg')) return 'image/svg+xml';
+  if (lower.includes('.ico')) return 'image/x-icon';
+  if (lower.includes('.webp')) return 'image/webp';
+  return undefined;
+}
+
+/** Metadata icons — same-origin proxy first (works even when /api uploads are remote). */
+export function buildFaviconMetadata(site?: Site | null): Metadata['icons'] | undefined {
+  const absolute = getSiteFaviconUrl(site);
+  if (!absolute) return undefined;
+  const type = getFaviconMimeType(absolute);
+  return {
+    icon: [
+      { url: '/api/favicon', type },
+      { url: '/favicon.ico', type },
+      { url: absolute, type },
+    ],
+    shortcut: [{ url: '/api/favicon', type }],
+    apple: [{ url: '/api/favicon', type }],
+  };
 }
 
 export function generateMetadata(seoData: SEOData, site?: Site): Metadata {
-  const { title, description, keywords, ogImageUrl, noIndex } = seoData
-  
-  // Use site name as fallback and for title suffix
-  const siteName = site?.business?.name || site?.name || 'Web Builder Site'
-  const finalTitle = title ? `${title} | ${siteName}` : siteName
-  
+  const { title, description, keywords, ogImageUrl, noIndex } = seoData;
+
+  const siteName = site?.business?.name || site?.name || 'Web Builder Site';
+  const finalTitle = title ? `${title} | ${siteName}` : siteName;
+
   const metadata: Metadata = {
     title: finalTitle,
     description: description || site?.business?.description || 'Generated site using Web Builder',
     keywords: keywords?.join(', ') || site?.seo?.keywords?.join(', '),
-  }
+  };
 
-  const faviconUrl = getSiteFaviconUrl(site)
-  if (faviconUrl) {
-    metadata.icons = {
-      icon: [{ url: faviconUrl }],
-      shortcut: [{ url: faviconUrl }],
-      apple: [{ url: faviconUrl }],
-    }
-  }
+  const icons = buildFaviconMetadata(site);
+  if (icons) metadata.icons = icons;
 
-  // Add Open Graph metadata
   if (ogImageUrl || site?.seo?.ogImageUrl) {
     metadata.openGraph = {
       title: finalTitle,
@@ -52,10 +100,9 @@ export function generateMetadata(seoData: SEOData, site?: Site): Metadata {
           alt: finalTitle,
         },
       ],
-    }
+    };
   }
 
-  // Add robots meta tag for no-index
   if (noIndex) {
     metadata.robots = {
       index: false,
@@ -64,10 +111,10 @@ export function generateMetadata(seoData: SEOData, site?: Site): Metadata {
         index: false,
         follow: false,
       },
-    }
+    };
   }
 
-  return metadata
+  return metadata;
 }
 
 export function getPageSeoData(page: Page | ServiceAreaPage): SEOData {
@@ -77,7 +124,7 @@ export function getPageSeoData(page: Page | ServiceAreaPage): SEOData {
     keywords: page.seo?.keywords,
     ogImageUrl: page.seo?.ogImageUrl,
     noIndex: page.seo?.noIndex,
-  }
+  };
 }
 
 export function getServiceSeoData(service: Service): SEOData {
@@ -86,8 +133,8 @@ export function getServiceSeoData(service: Service): SEOData {
     description: service.seo?.description,
     keywords: service.seo?.keywords,
     ogImageUrl: service.seo?.ogImageUrl,
-    noIndex: false, // Services don't have noIndex in their schema
-  }
+    noIndex: false,
+  };
 }
 
 export function getBlogPostSeoData(blogPost: BlogPost): SEOData {
@@ -96,8 +143,8 @@ export function getBlogPostSeoData(blogPost: BlogPost): SEOData {
     description: blogPost.seo?.description || blogPost.excerpt,
     keywords: blogPost.seo?.keywords,
     ogImageUrl: blogPost.seo?.ogImageUrl || blogPost.featuredImage?.url,
-    noIndex: false, // Blog posts don't have noIndex in their schema
-  }
+    noIndex: false,
+  };
 }
 
 export function getSiteSeoData(site: Site): SEOData {
@@ -106,6 +153,6 @@ export function getSiteSeoData(site: Site): SEOData {
     description: site.seo?.description,
     keywords: site.seo?.keywords,
     ogImageUrl: site.seo?.ogImageUrl,
-    noIndex: false, // Sites don't have noIndex in their schema
-  }
+    noIndex: false,
+  };
 }

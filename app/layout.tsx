@@ -9,12 +9,11 @@ import { AmbientFoundation } from '@/app/components/cinematic/AmbientFoundation'
 import { HeroIntroProvider } from '@/app/providers/HeroIntroProvider';
 import { Header } from '@/app/components/layout/Header';
 import { fetchSiteBootstrap } from '@/app/lib/siteBootstrap';
-import { getSiteFaviconUrl } from '@/app/lib/metadata';
+import { buildFaviconMetadata, getSiteFaviconUrl, getFaviconMimeType } from '@/app/lib/metadata';
 
 export async function generateMetadata(): Promise<Metadata> {
   const data = await fetchSiteBootstrap();
   const site = data.site;
-  const faviconUrl = getSiteFaviconUrl(site);
   const title = site?.seo?.title || site?.business?.name || site?.name || 'Web Builder Site';
   const description =
     site?.seo?.description || site?.business?.description || 'Generated site using Web Builder';
@@ -22,23 +21,26 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    ...(faviconUrl
-      ? {
-          icons: {
-            icon: [{ url: faviconUrl }],
-            shortcut: [{ url: faviconUrl }],
-            apple: [{ url: faviconUrl }],
-          },
-        }
-      : {}),
+    icons: buildFaviconMetadata(site),
   };
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const initialData = await fetchSiteBootstrap();
+  const faviconUrl = getSiteFaviconUrl(initialData.site);
+  const faviconType = getFaviconMimeType(faviconUrl);
 
   return (
     <html lang="en">
+      <head>
+        {faviconUrl ? (
+          <>
+            <link rel="icon" href="/api/favicon" type={faviconType} sizes="any" />
+            <link rel="shortcut icon" href="/favicon.ico" />
+            <link rel="apple-touch-icon" href="/api/favicon" />
+          </>
+        ) : null}
+      </head>
       <body suppressHydrationWarning className="antialiased">
         <ErrorBoundary>
           <WebBuilderProvider initialData={initialData}>

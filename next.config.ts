@@ -29,6 +29,13 @@ function buildImageRemotePatterns(): RemotePattern[] {
   return patterns;
 }
 
+function resolveApiOrigin(): string {
+  const raw = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+  const remoteApi =
+    raw && raw.startsWith("http") ? raw.replace(/\/$/, "") : null;
+  return remoteApi ?? "http://localhost:5000/api";
+}
+
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
@@ -38,23 +45,28 @@ const nextConfig: NextConfig = {
     remotePatterns: buildImageRemotePatterns(),
   },
   async rewrites() {
-    const raw = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
-    const remoteApi =
-      raw && raw.startsWith('http')
-        ? raw.replace(/\/$/, '')
-        : null;
-    const apiOrigin = remoteApi ?? 'http://localhost:5000/api';
+    const apiOrigin = resolveApiOrigin();
 
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${apiOrigin}/:path*`,
-      },
-      {
-        source: '/uploads/:path*',
-        destination: `${apiOrigin}/uploads/:path*`,
-      },
-    ];
+    return {
+      // Browsers auto-request /favicon.ico — serve builder favicon via local proxy.
+      beforeFiles: [
+        {
+          source: "/favicon.ico",
+          destination: "/api/favicon",
+        },
+      ],
+      // Only proxy unmatched /api/* to Sitify so local routes (contact, favicon) win.
+      fallback: [
+        {
+          source: "/api/:path*",
+          destination: `${apiOrigin}/:path*`,
+        },
+        {
+          source: "/uploads/:path*",
+          destination: `${apiOrigin}/uploads/:path*`,
+        },
+      ],
+    };
   },
 };
 
