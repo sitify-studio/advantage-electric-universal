@@ -1,12 +1,11 @@
 User-Agent: *
 Allow: /
-Allow: /about-us
-Allow: /contact-us
-Allow: /testimonials
-Allow: /gallery
-Allow: /serving-areas
 Allow: /privacy-policy
 Allow: /terms-of-service
+Allow: /testimonials
+Allow: /service-list
+Allow: /contact
+Allow: /about
 Allow: /service/
 Allow: /service/electrical-repairs
 Allow: /service/commercial-electrical-services
